@@ -22,7 +22,6 @@
 #include <robot_headers/Integrator.hpp>
 
 namespace pl = std::placeholders;
-
 using namespace Eigen;
 
 namespace shared
