@@ -15,7 +15,7 @@ public:
                                 state_type& control,
                                 state_type& control_error,
                                 state_type& int_times,
-                                state_type& result) const = 0;
+                                state_type& result) = 0;
 
     virtual void ode(const state_type& x , state_type& dxdt , double t) const = 0;
 

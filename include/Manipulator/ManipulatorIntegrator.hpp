@@ -78,7 +78,7 @@ public:
                                 state_type& control,
                                 state_type& control_error,
                                 state_type& int_times,
-                                state_type& result) const override;
+                                state_type& result) override;
 
     void do_integration_delta(std::vector<double>& x,
                               std::vector<double>& control,

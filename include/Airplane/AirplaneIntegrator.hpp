@@ -36,7 +36,7 @@ public:
                                 state_type& control,
                                 state_type& control_error,
                                 state_type& int_times,
-                                state_type& result) const override;
+                                state_type& result) override;
 
     virtual void ode(const state_type& x , state_type& dxdt , double t) const override;
     
