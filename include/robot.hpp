@@ -17,6 +17,7 @@
 #include "Action.hpp"
 #include <frapu_core/core.hpp>
 #include "RobotState.hpp"
+#include "StateSpace.hpp"
 
 #ifdef USE_OPENRAVE
 #include <viewer_interface/viewer_interface.hpp>
@@ -49,6 +50,8 @@ public:
                                 frapu::RobotStateSharedPtr& result);
 
     // ******************** Virtual methods **************************
+    virtual bool makeStateSpace() = 0;
+    
     virtual bool makeActionSpace(bool normalizedActionSpace) = 0;
 
     virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) = 0;
@@ -72,7 +75,7 @@ public:
             frapu::RobotStateSharedPtr& nextState) = 0;
 
     virtual void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
-                                          std::vector<double>& control,
+                                          const frapu::ActionSharedPtr& control,
                                           double& duration,
                                           std::vector<Eigen::MatrixXd>& matrices) const = 0;
 
@@ -118,17 +121,11 @@ public:
 
     virtual bool constraintsEnforced();
 
-    virtual bool enforceConstraints(std::vector<double>& state) const;
+    virtual bool enforceConstraints(frapu::RobotStateSharedPtr& state) const;
 
     virtual bool enforceControlConstraints(std::vector<double>& control) const;
 
-    virtual void getStateLimits(std::vector<double>& lowerLimits, std::vector<double>& upperLimits) const;
-
-    virtual void getControlLimits(std::vector<double>& lowerLimits, std::vector<double>& upperLimits) const;
-
     virtual void sampleRandomControl(std::vector<double>& control, std::default_random_engine* randGen, std::string& actionSamplingStrategy);
-
-
 
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
@@ -150,6 +147,8 @@ public:
      * Calculates the likelihood of 'observation' given 'state'
      */
     virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation);
+    
+    std::shared_ptr<shared::StateSpace> getStateSpace() const;
 
     shared::ObservationSpace* getObservationSpace() const;
 
@@ -159,7 +158,6 @@ public:
     virtual void setupViewer(std::string model_file, std::string environment_file);
 
     virtual void resetViewer(std::string model_file, std::string environment_file);
-
 
     void getCameraImage(std::vector<uint8_t>& image, int width, int height);
 
@@ -195,6 +193,8 @@ protected:
     std::shared_ptr<Eigen::Distribution<double>> process_distribution_;
 
     std::shared_ptr<Eigen::Distribution<double>> observation_distribution_;
+    
+    std::shared_ptr<frapu::StateSpace> stateSpace_;
 
     std::shared_ptr<shared::ObservationSpace> observationSpace_;
 

@@ -26,7 +26,7 @@ class VectorAction: public Action
 public:
     VectorAction():
         Action(),
-        actionVec_() {	   
+        actionVec_() {
 
     }
 
@@ -89,27 +89,6 @@ public:
 
 protected:
     std::vector<double> actionVec_;
-
-};
-
-class BoundedVectorAction: public VectorAction
-{
-public:
-    BoundedVectorAction(std::vector<double>& actionVec,
-                        std::vector<double>& lowerLimits,
-                        std::vector<double>& upperLimits):
-        VectorAction(actionVec) {
-
-    }
-    
-    virtual void getLimits(std::vector<double> &lowerLimits, std::vector<double> &upperLimits) const {
-	lowerLimits = lowerLimits_;
-	upperLimits = upperLimits_;
-    }
-    
-protected:
-    std::vector<double> lowerLimits_;
-    std::vector<double> upperLimits_;
 
 };
 

@@ -95,6 +95,9 @@ public:
 
     void setActionLimits(std::vector<double>& lowerActionLimits,
                          std::vector<double>& upperActionLimits);
+    
+    void getActionLimits(std::vector<double> &lowerActionLimits, 
+			 std::vector<double> &upperActionLimits) const;
 
     unsigned int getNumDimensions() const;
 
