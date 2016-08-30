@@ -113,7 +113,7 @@ public:
 	
     }
 
-    std::vector<double> asVector() {
+    std::vector<double> asVector() const {
         return state_;
     }
 

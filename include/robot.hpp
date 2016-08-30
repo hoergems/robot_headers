@@ -14,8 +14,9 @@
 #include "ContinuousObservationSpace.hpp"
 #include "DiscreteActionSpace.hpp"
 #include "ContinuousActionSpace.hpp"
+#include "Action.hpp"
 #include <frapu_core/core.hpp>
-//#include <frapu_core/interface.hpp>
+#include "RobotState.hpp"
 
 #ifdef USE_OPENRAVE
 #include <viewer_interface/viewer_interface.hpp>
@@ -34,54 +35,56 @@ public:
 
     virtual ~Robot() = default;
 
-    bool propagateState(const std::vector<double>& current_state,
-                        std::vector<double>& control_input,
-                        std::vector<double>& control_error,
-                        double duration,
-                        double simulation_step_size,
-                        std::vector<double>& result);
+    virtual bool propagateState(const frapu::RobotStateSharedPtr& state,
+                                const frapu::ActionSharedPtr& action,
+                                double duration,
+                                double simulationStepSize,
+                                frapu::RobotStateSharedPtr& result);
 
-    /**
-     * Propagate the state without explicitly passing the control error.
-     * The control error has to be sampled inside this method instead.
-     */
-    bool propagateState(const std::vector<double>& current_state,
-                        std::vector<double>& control_input,
-                        double duration,
-                        double simulation_step_size,
-                        std::vector<double>& result);
+    virtual bool propagateState(const frapu::RobotStateSharedPtr& state,
+                                const frapu::ActionSharedPtr& action,
+                                const std::vector<double> controlError,
+                                double duration,
+                                double simulationStepSize,
+                                frapu::RobotStateSharedPtr& result);
 
     // ******************** Virtual methods **************************
     virtual bool makeActionSpace(bool normalizedActionSpace) = 0;
 
     virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) = 0;
 
-    virtual bool getObservation(std::vector<double>& state, std::vector<double>& observation) const = 0;
+    virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
+                                std::vector<double>& observation) const = 0;
 
-    virtual bool getObservation(std::vector<double>& state, std::vector<double>& observationError, std::vector<double>& observation) const = 0;
+    virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
+                                std::vector<double>& observationError,
+                                std::vector<double>& observation) const = 0;
 
-    virtual void createRobotCollisionObjects(const std::vector<double>& state,
+    virtual void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
             std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const = 0;
 
     virtual int getStateSpaceDimension() const = 0;
 
     virtual int getDOF() const = 0;
 
-    virtual void makeNextStateAfterCollision(std::vector<double>& previous_state,
-            std::vector<double>& colliding_state,
-            std::vector<double>& next_state) = 0;
+    virtual void makeNextStateAfterCollision(const frapu::RobotStateSharedPtr& previousState,
+            const frapu::RobotStateSharedPtr& collidingState,
+            frapu::RobotStateSharedPtr& nextState) = 0;
 
-    virtual void getLinearProcessMatrices(const std::vector<double>& state,
+    virtual void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
                                           std::vector<double>& control,
                                           double& duration,
                                           std::vector<Eigen::MatrixXd>& matrices) const = 0;
-    virtual void getLinearObservationDynamics(const std::vector<double>& state,
+
+    virtual void getLinearObservationDynamics(const frapu::RobotStateSharedPtr& state,
             Eigen::MatrixXd& H,
             Eigen::MatrixXd& W) const = 0;
 
-    virtual bool isTerminal(std::vector<double>& state) const = 0;
+    virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const = 0;
 
-    virtual double distanceGoal(std::vector<double>& state) const = 0;
+    virtual bool isValid(const frapu::RobotStateSharedPtr& state) const;
+
+    virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const = 0;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
                                          Eigen::MatrixXd& covariance_matrix,
@@ -91,15 +94,16 @@ public:
             Eigen::MatrixXd& covariance_matrix,
             unsigned long seed) = 0;
 
-    virtual void transformToObservationSpace(std::vector<double>& state, std::vector<double>& res) const = 0;
+    virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
+            std::vector<double>& res) const = 0;
 
-    virtual void updateViewer(std::vector<double>& state,
+    virtual void updateViewer(const frapu::RobotStateSharedPtr& state,
                               std::vector<std::vector<double>>& particles,
-                              std::vector<std::vector<double>>& particle_colors) = 0;
+                              std::vector<std::vector<double>>& particleColors) = 0;
 
     //****************** End of virtual methods ************************
-    virtual void updateRobot(std::vector<double> &robotState);
-			      
+    virtual void updateRobot(const frapu::RobotStateSharedPtr& state);
+
     virtual void setGravityConstant(double gravity_constant);
 
     void setEnvironmentInfo(frapu::EnvironmentInfoSharedPtr& environmentInfo);
@@ -128,7 +132,7 @@ public:
 
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
-    virtual bool checkSelfCollision(const std::vector<double>& state) const;
+    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;
 
     virtual void setStateCovarianceMatrix(Eigen::MatrixXd& state_covariance_matrix);
 
@@ -145,7 +149,7 @@ public:
     /**
      * Calculates the likelihood of 'observation' given 'state'
      */
-    virtual double calcLikelihood(std::vector<double>& state, std::vector<double>& observation);
+    virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation);
 
     shared::ObservationSpace* getObservationSpace() const;
 

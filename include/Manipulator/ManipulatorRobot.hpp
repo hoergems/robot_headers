@@ -79,14 +79,14 @@ public:
 
     void getJointAxis(std::vector<std::string>& joints, std::vector<std::vector<int>>& axis);
 
-    virtual void getLinearProcessMatrices(const std::vector<double>& state,
+    virtual void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
                                           std::vector<double>& control,
                                           double& duration,
                                           std::vector<Eigen::MatrixXd>& matrices) const override;
 
-    virtual bool isTerminal(std::vector<double>& state) const override;
+    virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const override;
 
-    virtual double distanceGoal(std::vector<double>& state) const override;
+    virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual bool enforceConstraints(std::vector<double>& state) const override;
 
@@ -111,21 +111,25 @@ public:
 
     virtual int getDOF() const override;
 
-    virtual void makeNextStateAfterCollision(std::vector<double>& previous_state,
-            std::vector<double>& colliding_state,
-            std::vector<double>& next_state) override;
+    virtual void makeNextStateAfterCollision(const frapu::RobotStateSharedPtr& previousState,
+            const frapu::RobotStateSharedPtr& collidingState,
+            frapu::RobotStateSharedPtr& nextState) override;
 
-    virtual bool getObservation(std::vector<double>& state, std::vector<double>& observation) const override;
+    virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
+                                std::vector<double>& observation) const override;
 
-    virtual bool getObservation(std::vector<double>& state, std::vector<double>& observationError, std::vector<double>& observation) const override;
+    virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
+                                std::vector<double>& observationError,
+                                std::vector<double>& observation) const override;
 
     bool makeActionSpace(bool normalizedActionSpace) override;
 
     virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) override;
 
-    virtual void transformToObservationSpace(std::vector<double>& state, std::vector<double>& res) const override;
+    virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
+            std::vector<double>& res) const override;
 
-    virtual void getLinearObservationDynamics(const std::vector<double>& state,
+    virtual void getLinearObservationDynamics(const frapu::RobotStateSharedPtr& state,
             Eigen::MatrixXd& H,
             Eigen::MatrixXd& W) const override;
 
@@ -134,8 +138,8 @@ public:
                                          unsigned long seed) override;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-                                             Eigen::MatrixXd& covariance_matrix,
-                                             unsigned long seed) override;
+            Eigen::MatrixXd& covariance_matrix,
+            unsigned long seed) override;
 
     bool propagate_first_order(std::vector<double>& current_state,
                                std::vector<double>& control_input,
@@ -174,15 +178,12 @@ public:
     /**
      * Create the robot collision objects
      */
-    void createRobotCollisionObjects(const std::vector<double>& state,
-                                     std::vector<std::shared_ptr<fcl::CollisionObject>>& collision_objects) const override;
-
-    std::vector<std::shared_ptr<fcl::CollisionObject>>
-            createRobotCollisionObjectsPy(const std::vector<double>& joint_angles);
+    virtual void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
+            std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;
 
     virtual bool checkSelfCollision(std::vector<std::shared_ptr<fcl::CollisionObject>>& collision_objects) const override;
 
-    virtual bool checkSelfCollision(const std::vector<double>& state) const override;
+    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const override;
 
     bool checkSelfCollisionPy(boost::python::list& ns);
 
@@ -223,9 +224,9 @@ public:
                                            double t_e);
     virtual void setNewtonModel() override;
 
-    void updateViewer(std::vector<double>& state,
+    void updateViewer(const frapu::RobotStateSharedPtr& state,
                       std::vector<std::vector<double>>& particles,
-                      std::vector<std::vector<double>>& particle_colors) override;
+                      std::vector<std::vector<double>>& particleColors) override;
 
 
 #ifdef USE_OPENRAVE

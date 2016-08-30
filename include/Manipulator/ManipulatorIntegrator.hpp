@@ -74,10 +74,10 @@ public:
                                      std::vector<double>& int_times,
                                      std::vector<double>& result);
 
-    virtual void do_integration(state_type& x,
-                                state_type& control,
-                                state_type& control_error,
-                                state_type& int_times,
+    virtual void do_integration(const state_type& x,
+                                const state_type& control,
+                                const state_type& control_error,
+                                const state_type& int_times,
                                 state_type& result) override;
 
     void do_integration_delta(std::vector<double>& x,
