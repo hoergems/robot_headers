@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "utils.hpp"
+#include <frapu_core/core.hpp>
 
 namespace shared
 {

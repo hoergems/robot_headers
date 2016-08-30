@@ -39,6 +39,7 @@
 #include <memory>
 #include <cmath>
 #include <assert.h>
+#include <frapu_core/core.hpp>
 
 
 /*
@@ -161,7 +162,7 @@ public:
 	    
 	    hashValue = 0;
 	    for (auto &k: elements[i].first) {
-		robotutils::hash_combine(hashValue, k);
+		frapu::hash_combine(hashValue, k);
 	    }
 	    
 	    hashValues_[i] = hashValue;
@@ -197,7 +198,7 @@ public:
         double value = x[0];
 	size_t hashValue = 0;
 	for (auto &k: x) {
-	    robotutils::hash_combine(hashValue, k);
+	    frapu::hash_combine(hashValue, k);
 	}
 	
 	size_t index = 0;

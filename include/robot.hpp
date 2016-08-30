@@ -50,9 +50,8 @@ public:
                         double duration,
                         double simulation_step_size,
                         std::vector<double>& result);
-    
-    virtual void updateRobot(std::vector<double> &robotState);
 
+    // ******************** Virtual methods **************************
     virtual bool makeActionSpace(bool normalizedActionSpace) = 0;
 
     virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) = 0;
@@ -65,10 +64,6 @@ public:
             std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const = 0;
 
     virtual int getStateSpaceDimension() const = 0;
-    
-    void setEnvironmentInfo(frapu::EnvironmentInfoSharedPtr &environmentInfo);
-
-    virtual unsigned int getControlSpaceDimension() const;
 
     virtual int getDOF() const = 0;
 
@@ -76,9 +71,42 @@ public:
             std::vector<double>& colliding_state,
             std::vector<double>& next_state) = 0;
 
-    virtual void setGoalArea(std::vector<double>& goal_position, double& goal_radius);
+    virtual void getLinearProcessMatrices(const std::vector<double>& state,
+                                          std::vector<double>& control,
+                                          double& duration,
+                                          std::vector<Eigen::MatrixXd>& matrices) const = 0;
+    virtual void getLinearObservationDynamics(const std::vector<double>& state,
+            Eigen::MatrixXd& H,
+            Eigen::MatrixXd& W) const = 0;
 
-    virtual void setGravityConstant(double gravity_constant) = 0;
+    virtual bool isTerminal(std::vector<double>& state) const = 0;
+
+    virtual double distanceGoal(std::vector<double>& state) const = 0;
+
+    virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
+                                         Eigen::MatrixXd& covariance_matrix,
+                                         unsigned long seed) = 0;
+
+    virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
+            Eigen::MatrixXd& covariance_matrix,
+            unsigned long seed) = 0;
+
+    virtual void transformToObservationSpace(std::vector<double>& state, std::vector<double>& res) const = 0;
+
+    virtual void updateViewer(std::vector<double>& state,
+                              std::vector<std::vector<double>>& particles,
+                              std::vector<std::vector<double>>& particle_colors) = 0;
+
+    //****************** End of virtual methods ************************
+    virtual void updateRobot(std::vector<double> &robotState);
+			      
+    virtual void setGravityConstant(double gravity_constant);
+
+    void setEnvironmentInfo(frapu::EnvironmentInfoSharedPtr& environmentInfo);
+
+    virtual unsigned int getControlSpaceDimension() const;
+
+    virtual void setGoalArea(std::vector<double>& goal_position, double& goal_radius);
 
     virtual void setNewtonModel();
 
@@ -96,17 +124,7 @@ public:
 
     virtual void sampleRandomControl(std::vector<double>& control, std::default_random_engine* randGen, std::string& actionSamplingStrategy);
 
-    virtual void getLinearProcessMatrices(const std::vector<double>& state,
-                                          std::vector<double>& control,
-                                          double& duration,
-                                          std::vector<Eigen::MatrixXd>& matrices) const = 0;
-    virtual void getLinearObservationDynamics(const std::vector<double>& state,
-            Eigen::MatrixXd& H,
-            Eigen::MatrixXd& W) const = 0;
 
-    virtual bool isTerminal(std::vector<double>& state) const = 0;
-
-    virtual double distanceGoal(std::vector<double>& state) const = 0;
 
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
@@ -120,37 +138,23 @@ public:
 
     virtual void getObservationCovarianceMatrix(Eigen::MatrixXd& observation_covariance_matrix) const;
 
-    virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) = 0;
-
-    virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) = 0;
-
     std::shared_ptr<Eigen::Distribution<double>> getProcessDistribution() const;
 
     std::shared_ptr<Eigen::Distribution<double>> getObservationDistribution() const;
-    
+
     /**
      * Calculates the likelihood of 'observation' given 'state'
      */
-    virtual double calcLikelihood(std::vector<double> &state, std::vector<double> &observation);
+    virtual double calcLikelihood(std::vector<double>& state, std::vector<double>& observation);
 
     shared::ObservationSpace* getObservationSpace() const;
 
     std::shared_ptr<shared::ActionSpace> getActionSpace() const;
 
-    virtual void transformToObservationSpace(std::vector<double>& state, std::vector<double>& res) const = 0;
-
     /*** Methods for viewer interface ***/
     virtual void setupViewer(std::string model_file, std::string environment_file);
 
     virtual void resetViewer(std::string model_file, std::string environment_file);
-
-    virtual void updateViewer(std::vector<double>& state,
-                              std::vector<std::vector<double>>& particles,
-                              std::vector<std::vector<double>>& particle_colors) = 0;
 
 
     void getCameraImage(std::vector<uint8_t>& image, int width, int height);
@@ -191,7 +195,7 @@ protected:
     std::shared_ptr<shared::ObservationSpace> observationSpace_;
 
     std::shared_ptr<shared::ActionSpace> actionSpace_;
-    
+
     frapu::EnvironmentInfoSharedPtr environmentInfo_;
 
 #ifdef USE_OPENRAVE
@@ -346,9 +350,9 @@ public:
                                      unsigned long seed) {
         this->get_override("makeObservationDistribution")(mean, covariance_matrix, seed);
     }
-    
-    double calcLikelihood(std::vector<double> &state, std::vector<double> &observation) {
-	this->get_override("calcLikelihood")(state, observation);
+
+    double calcLikelihood(std::vector<double>& state, std::vector<double>& observation) {
+        this->get_override("calcLikelihood")(state, observation);
     }
 
 };
