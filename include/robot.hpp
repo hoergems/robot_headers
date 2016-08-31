@@ -148,7 +148,7 @@ public:
      */
     virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation);
     
-    std::shared_ptr<shared::StateSpace> getStateSpace() const;
+    std::shared_ptr<frapu::StateSpace> getStateSpace() const;
 
     shared::ObservationSpace* getObservationSpace() const;
 
@@ -180,11 +180,7 @@ protected:
 
     std::vector<double> goal_position_;
 
-    double goal_radius_;
-
-    std::vector<double> lowerStateLimits_;
-
-    std::vector<double> upperStateLimits_;
+    double goal_radius_;    
 
     std::vector<double> lowerControlLimits_;
 
@@ -240,11 +236,7 @@ public:
     void createRobotCollisionObjects(const std::vector<double>& state,
                                      std::vector<std::shared_ptr<fcl::CollisionObject>>& collision_objects) const {
         this->get_override("createRobotCollisionObjects")(state, collision_objects);
-    }
-
-    void getStateLimits(std::vector<double>& lowerLimits, std::vector<double>& upperLimits) const {
-        this->get_override("getStateLimits")(lowerLimits, upperLimits);
-    }
+    }   
 
     void getControlLimits(std::vector<double>& lowerLimits, std::vector<double>& upperLimits) const {
         this->get_override("getControlLimits")(lowerLimits, upperLimits);

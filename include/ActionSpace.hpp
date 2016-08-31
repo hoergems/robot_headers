@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <frapu_core/core.hpp>
+#include "Action.hpp"
 
 using std::cout;
 using std::endl;
@@ -11,12 +13,56 @@ using std::endl;
 namespace shared
 {
 
+class ActionLimits
+{
+public:
+    ActionLimits() {
+
+    }
+
+    virtual bool enforceLimits(frapu::ActionSharedPtr& action) const = 0;
+
+};
+
+class VectorActionLimits: public ActionLimits
+{
+public:
+    VectorActionLimits(std::vector<double>& lowerLimits,
+                       std::vector<double>& upperLimits):
+        ActionLimits(),
+        lowerLimits_(lowerLimits),
+        upperLimits_(upperLimits) {
+
+    }
+
+    virtual bool enforceLimits(frapu::ActionSharedPtr& action) const override {
+        std::vector<double> actionVec = static_cast<frapu::VectorAction*>(action.get())->asVector();
+        bool enforced = false;
+        for (size_t i = 0; i < actionVec.size(); i++) {
+            if (actionVec[i] < lowerLimits_[i]) {
+                enforced = true;
+                actionVec[i] = lowerLimits_[i];
+            } else if (actionVec[i] > upperLimits_[i]) {
+                enforced = true;
+                actionVec[i] = upperLimits_[i];
+            }
+        }
+
+        state = std::make_shared<frapu::VectorAction>(stateVec);
+        return enforced;
+    }
+
+protected:
+    std::vector<double>& lowerLimits_;
+    std::vector<double>& upperLimits_;
+
+};
+
 // Normalization functor
 struct normalize {
 public:
     normalize():
-        lowerActionLimits_(),
-        upperActionLimits_() {
+        actionLimits_(nullptr) {
 
     }
 
@@ -25,15 +71,13 @@ public:
 
     virtual void operator()(std::vector<double>& a1,
                             std::vector<double>& a2) = 0;
-			    
-    void setActionLimits(std::vector<double> &lowerActionLimits, std::vector<double> upperActionLimits) {
-	lowerActionLimits_ = lowerActionLimits;
-	upperActionLimits_ = upperActionLimits;
+
+    void setActionLimits(std::shared_ptr<ActionLimits> &actionLimits) {
+        actionLimits_ = actionLimits;
     }
 
 protected:
-    std::vector<double> lowerActionLimits_;
-    std::vector<double> upperActionLimits_;
+    std::shared_ptr<ActionLimits> actionLimits_;    
 };
 
 struct standardNormalize: public normalize {
@@ -68,7 +112,7 @@ public:
         normalize() {
 
     }
-    
+
     virtual void denormalizeAction(std::vector<double>& a1,
                                    std::vector<double>& a2) override {
         a2 = a1;
@@ -93,11 +137,9 @@ public:
 
     void setNumDimensions(unsigned int& numDimensions);
 
-    void setActionLimits(std::vector<double>& lowerActionLimits,
-                         std::vector<double>& upperActionLimits);
-    
-    void getActionLimits(std::vector<double> &lowerActionLimits, 
-			 std::vector<double> &upperActionLimits) const;
+    void setActionLimits(std::shared_ptr<shared::ActionLimits> &actionLimits);
+
+    std::shared_ptr<ActionLimits> getActionLimits() const;
 
     unsigned int getNumDimensions() const;
 
@@ -106,16 +148,14 @@ public:
 
     void denormalizeAction(std::vector<double>& action,
                            std::vector<double>& normalizedAction);
-    
+
     bool isNormalized() const;
 
 protected:
     unsigned int numDimensions_;
 
-    std::vector<double> lowerActionLimits_;
+    std::shared_ptr<ActionLimits> actionLimits_;
 
-    std::vector<double> upperActionLimits_;
-    
     bool normalizedActionSpace_;
 
     std::unique_ptr<shared::normalize> actionNormalizer_;
