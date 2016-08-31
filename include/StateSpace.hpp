@@ -44,6 +44,12 @@ public:
         return enforced;
     }
 
+    virtual void getVectorLimits(std::vector<double>& lowerLimits,
+                                 std::vector<double>& upperLimits) const {
+        lowerLimits = lowerLimits_;
+        upperLimits = upperLimits_;
+    }
+
 protected:
     std::vector<double> lowerLimits_;
     std::vector<double> upperLimits_;
@@ -74,7 +80,7 @@ public:
             return stateLimits_->enforceLimits(state);
         }
     }
-    
+
     std::shared_ptr<StateLimits> getStateLimits() const {
         return stateLimits_;
     }
