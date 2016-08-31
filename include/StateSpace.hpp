@@ -85,6 +85,8 @@ public:
         return stateLimits_;
     }
 
+    virtual RobotStateSharedPtr sampleUniform(std::default_random_engine* randGen) const = 0;
+
 protected:
     std::shared_ptr<StateLimits> stateLimits_;
 
@@ -106,6 +108,20 @@ public:
 
     unsigned int getDimensions() const {
         return dimensions_;
+    }
+
+    virtual RobotStateSharedPtr sampleUniform(std::default_random_engine* randGen) const override {
+        std::vector<double> randomStateVec;
+        std::vector<double> lowerStateLimits;
+        std::vector<double> upperStateLimits;
+        static_cast<VectorStateLimits*>(stateLimits_.get())->getVectorLimits(lowerStateLimits, upperStateLimits);
+        for (size_t i = 0; i < lowerStateLimits.size(); i++) {
+            std::uniform_real_distribution<double> uniform_dist(lowerStateLimits[i], upperStateLimits[i]);
+            double rand_num = uniform_dist(*randGen);
+            randomStateVec.push_back(rand_num);
+        }
+        
+        return std::make_shared<frapu::VectorState>(randomStateVec);
     }
 
 protected:

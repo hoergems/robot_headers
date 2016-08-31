@@ -57,11 +57,11 @@ public:
     virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) = 0;
 
     virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
-                                std::vector<double>& observation) const = 0;
+                                frapu::ObservationSharedPtr& observation) const = 0;
 
     virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
                                 std::vector<double>& observationError,
-                                std::vector<double>& observation) const = 0;
+                                frapu::ObservationSharedPtr& observation) const = 0;
 
     virtual void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
             std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const = 0;
@@ -98,7 +98,7 @@ public:
             unsigned long seed) = 0;
 
     virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
-            std::vector<double>& res) const = 0;
+            frapu::ObservationSharedPtr& res) const = 0;
 
     virtual void updateViewer(const frapu::RobotStateSharedPtr& state,
                               std::vector<std::vector<double>>& particles,
@@ -132,7 +132,8 @@ public:
     /**
      * Calculates the likelihood of 'observation' given 'state'
      */
-    virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation);
+    virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, 
+                                  const frapu::ObservationSharedPtr& observation) const;
     
     frapu::StateSpaceSharedPtr getStateSpace() const;
 

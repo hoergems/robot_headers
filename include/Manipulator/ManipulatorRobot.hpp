@@ -117,11 +117,11 @@ public:
             frapu::RobotStateSharedPtr& nextState) override;
 
     virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
-                                std::vector<double>& observation) const override;
+                                frapu::ObservationSharedPtr& observation) const override;
 
     virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
                                 std::vector<double>& observationError,
-                                std::vector<double>& observation) const override;
+                                frapu::ObservationSharedPtr& observation) const override;
 
     bool makeStateSpace() override;
 
@@ -130,7 +130,7 @@ public:
     virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) override;
 
     virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
-            std::vector<double>& res) const override;
+            frapu::ObservationSharedPtr& res) const override;
 
     virtual void getLinearObservationDynamics(const frapu::RobotStateSharedPtr& state,
             Eigen::MatrixXd& H,

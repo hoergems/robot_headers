@@ -26,14 +26,14 @@ public:
     double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
 
     bool getObservation(const frapu::RobotStateSharedPtr& state,
-                        std::vector<double>& observation) const override;
+                        frapu::ObservationSharedPtr& observation) const override;
 
     bool getObservation(const frapu::RobotStateSharedPtr& state,
                         std::vector<double>& observationError,
-                        std::vector<double>& observation) const override;
+                        frapu::ObservationSharedPtr& observation) const override;
 
     void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
-                                     std::vector<double>& res) const override;
+                                     frapu::ObservationSharedPtr& res) const override;
 
     bool makeStateSpace() override;
 
@@ -69,7 +69,8 @@ public:
             Eigen::MatrixXd& covariance_matrix,
             unsigned long seed) override;
 
-    double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation) override;
+    double calcLikelihood(const frapu::RobotStateSharedPtr& state, 
+                          const frapu::ObservationSharedPtr& observation) const override;
 
     void updateRobot(const frapu::RobotStateSharedPtr& state) override;
 
