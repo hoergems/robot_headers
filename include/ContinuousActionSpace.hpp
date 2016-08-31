@@ -7,7 +7,7 @@ namespace frapu
 class ContinuousActionSpace: public ActionSpace
 {
 public:
-    ContinuousActionSpace(bool normalizedActionSpace);
+    ContinuousActionSpace(const ActionSpaceInfo &actionSpaceInfo);
     
     virtual std::string getType() const override;
 

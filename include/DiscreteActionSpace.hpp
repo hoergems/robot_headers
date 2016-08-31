@@ -7,7 +7,7 @@ namespace frapu
 class DiscreteActionSpace: public ActionSpace
 {
 public:
-    DiscreteActionSpace(bool normalizedActionSpace);
+    DiscreteActionSpace(const ActionSpaceInfo &actionSpaceInfo);
     
     virtual std::string getType() const override;
 

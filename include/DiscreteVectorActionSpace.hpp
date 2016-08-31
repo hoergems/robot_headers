@@ -7,7 +7,7 @@ namespace frapu
 class DiscreteVectorActionSpace: public DiscreteActionSpace
 {
 public:
-    DiscreteVectorActionSpace(bool normalizedActionSpace);
+    DiscreteVectorActionSpace(const ActionSpaceInfo &actionSpaceInfo);
     
     virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const override;
 };

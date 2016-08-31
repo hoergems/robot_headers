@@ -147,7 +147,7 @@ public:
 class ActionSpace
 {
 public:
-    ActionSpace(bool normalizedActionSpace);
+    ActionSpace(const ActionSpaceInfo &actionSpaceInfo);
 
     /**
      * Returns the type of the action space (discrete, continuous, hybrid)
@@ -163,19 +163,19 @@ public:
     frapu::ActionLimitsSharedPtr getActionLimits() const;
 
     unsigned int getNumDimensions() const;
+    
+    const ActionSpaceInfo getInfo() const;
 
     void normalizeAction(frapu::ActionSharedPtr& action);
 
-    void denormalizeAction(frapu::ActionSharedPtr& action);
-
-    bool isNormalized() const;
+    void denormalizeAction(frapu::ActionSharedPtr& action);    
 
 protected:
     unsigned int numDimensions_;
 
     frapu::ActionLimitsSharedPtr actionLimits_;
 
-    bool normalizedActionSpace_;
+    ActionSpaceInfo actionSpaceInfo_;
 
     std::unique_ptr<normalize> actionNormalizer_;
 

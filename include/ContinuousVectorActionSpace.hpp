@@ -7,7 +7,7 @@ namespace frapu
 class ContinuousVectorActionSpace: public ContinuousActionSpace
 {
 public:
-    ContinuousVectorActionSpace(bool normalizedActionSpace);
+    ContinuousVectorActionSpace(const ActionSpaceInfo &actionSpaceInfo);
     
     virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const override;
 };
