@@ -4,7 +4,7 @@
 #include <map>
 
 
-namespace shared
+namespace frapu
 {
 class DiscreteObservationSpace: public ObservationSpace
 {

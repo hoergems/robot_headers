@@ -10,8 +10,17 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
+
+struct ActionSpaceInfo {
+    ActionSpaceInfo() {}
+    
+    // 'discrete' or 'continuous'
+    std::string type = "discrete";
+    
+    bool normalized = false;
+};
 
 class ActionLimits
 {
@@ -48,8 +57,15 @@ public:
             }
         }
 
-        state = std::make_shared<frapu::VectorAction>(stateVec);
+        action = std::make_shared<frapu::VectorAction>(actionVec);
         return enforced;
+    }
+
+    virtual void getRawLimits(std::vector<double>& lowerLimits,
+                              std::vector<double>& upperLimits) const {
+        lowerLimits = lowerLimits_;
+        upperLimits = upperLimits_;
+
     }
 
 protected:
@@ -66,18 +82,16 @@ public:
 
     }
 
-    virtual void denormalizeAction(std::vector<double>& a1,
-                                   std::vector<double>& a2) = 0;
+    virtual void denormalizeAction(frapu::ActionSharedPtr& action) = 0;
 
-    virtual void operator()(std::vector<double>& a1,
-                            std::vector<double>& a2) = 0;
+    virtual void operator()(frapu::ActionSharedPtr& action) = 0;
 
-    void setActionLimits(std::shared_ptr<ActionLimits> &actionLimits) {
+    void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits) {
         actionLimits_ = actionLimits;
     }
 
 protected:
-    std::shared_ptr<ActionLimits> actionLimits_;    
+    frapu::ActionLimitsSharedPtr actionLimits_;
 };
 
 struct standardNormalize: public normalize {
@@ -87,22 +101,29 @@ public:
 
     }
 
-    virtual void denormalizeAction(std::vector<double>& a1,
-                                   std::vector<double>& a2) override {
-        a2.clear();
-        a2.resize(a1.size());
-        for (size_t i = 0; i < lowerActionLimits_.size(); i++) {
-            a2[i] = a1[i] * (upperActionLimits_[i] - lowerActionLimits_[i]) + lowerActionLimits_[i];
+    virtual void denormalizeAction(frapu::ActionSharedPtr& action) override {
+        std::vector<double> lowerActionLimits;
+        std::vector<double> upperActionLimits;
+        frapu::VectorActionLimits* vecA = static_cast<frapu::VectorActionLimits*>(actionLimits_.get());
+        static_cast<frapu::VectorActionLimits*>(actionLimits_.get())->getRawLimits(lowerActionLimits, upperActionLimits);
+        std::vector<double> actionVec = static_cast<frapu::VectorAction*>(action.get())->asVector();
+        for (size_t i = 0; i < actionVec.size(); i++) {
+            actionVec[i] = actionVec[i] * (upperActionLimits[i] - lowerActionLimits[i]) + lowerActionLimits[i];
         }
+
+        action = std::make_shared<frapu::VectorAction>(actionVec);
     }
 
-    virtual void operator()(std::vector<double>& a1,
-                            std::vector<double>& a2) override {
-        a2.clear();
-        a2.resize(a1.size());
-        for (size_t i = 0; i < lowerActionLimits_.size(); i++) {
-            a2[i] = (a1[i] - lowerActionLimits_[i]) / (upperActionLimits_[i] - lowerActionLimits_[i]);
+    virtual void operator()(frapu::ActionSharedPtr& action) override {
+        std::vector<double> lowerActionLimits;
+        std::vector<double> upperActionLimits;
+        static_cast<frapu::VectorActionLimits*>(actionLimits_.get())->getRawLimits(lowerActionLimits, upperActionLimits);
+        std::vector<double> actionVec = static_cast<frapu::VectorAction*>(action.get())->asVector();
+        for (size_t i = 0; i < actionVec.size(); i++) {
+            actionVec[i] = (actionVec[i] - lowerActionLimits[i]) / (upperActionLimits[i] - lowerActionLimits[i]);
         }
+
+        action = std::make_shared<frapu::VectorAction>(actionVec);
     }
 };
 
@@ -113,14 +134,12 @@ public:
 
     }
 
-    virtual void denormalizeAction(std::vector<double>& a1,
-                                   std::vector<double>& a2) override {
-        a2 = a1;
+    virtual void denormalizeAction(frapu::ActionSharedPtr& action) override {
+
     }
 
-    virtual void operator()(std::vector<double>& a1,
-                            std::vector<double>& a2) override {
-        a2 = a1;
+    virtual void operator()(frapu::ActionSharedPtr& action) override {
+
     }
 
 };
@@ -135,30 +154,30 @@ public:
      */
     virtual std::string getType() const = 0;
 
+    virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const = 0;
+
     void setNumDimensions(unsigned int& numDimensions);
 
-    void setActionLimits(std::shared_ptr<shared::ActionLimits> &actionLimits);
+    void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits);
 
-    std::shared_ptr<ActionLimits> getActionLimits() const;
+    frapu::ActionLimitsSharedPtr getActionLimits() const;
 
     unsigned int getNumDimensions() const;
 
-    void normalizeAction(std::vector<double>& action,
-                         std::vector<double>& normalizedAction);
+    void normalizeAction(frapu::ActionSharedPtr& action);
 
-    void denormalizeAction(std::vector<double>& action,
-                           std::vector<double>& normalizedAction);
+    void denormalizeAction(frapu::ActionSharedPtr& action);
 
     bool isNormalized() const;
 
 protected:
     unsigned int numDimensions_;
 
-    std::shared_ptr<ActionLimits> actionLimits_;
+    frapu::ActionLimitsSharedPtr actionLimits_;
 
     bool normalizedActionSpace_;
 
-    std::unique_ptr<shared::normalize> actionNormalizer_;
+    std::unique_ptr<normalize> actionNormalizer_;
 
 };
 }

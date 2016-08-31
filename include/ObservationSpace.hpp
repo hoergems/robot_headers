@@ -5,16 +5,16 @@
 #include "utils.hpp"
 #include <frapu_core/core.hpp>
 
-namespace shared
+namespace frapu
 {
-    
+
 struct ObservationSpaceInfo {
 public:
     ObservationSpaceInfo() {}
-    
+
     // The observation type ('discrete' or 'continuous')
     std::string observationType;
-    
+
     // Contains additional information (e.g. 'linear' or 'nonlinear')
     std::string observationModelInfo;
 };
@@ -22,18 +22,18 @@ public:
 class ObservationSpace
 {
 public:
-    ObservationSpace(const shared::ObservationSpaceInfo &observationSpaceInfo);
-    
+    ObservationSpace(const ObservationSpaceInfo& observationSpaceInfo);
+
     void setDimension(unsigned int dimension);
-    
+
     unsigned int getDimension() const;
-    
-    const shared::ObservationSpaceInfo getObservationSpaceInfo() const;
-    
+
+    const ObservationSpaceInfo getObservationSpaceInfo() const;
+
 private:
     unsigned int dimension_;
-    
-    shared::ObservationSpaceInfo observationSpaceInfo_;
+
+    ObservationSpaceInfo observationSpaceInfo_;
 };
 
 }

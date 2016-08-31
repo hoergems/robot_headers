@@ -52,9 +52,9 @@ public:
     // ******************** Virtual methods **************************
     virtual bool makeStateSpace() = 0;
     
-    virtual bool makeActionSpace(bool normalizedActionSpace) = 0;
+    virtual bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) = 0;
 
-    virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) = 0;
+    virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) = 0;
 
     virtual bool getObservation(const frapu::RobotStateSharedPtr& state,
                                 std::vector<double>& observation) const = 0;
@@ -121,12 +121,6 @@ public:
 
     virtual bool constraintsEnforced();
 
-    virtual bool enforceConstraints(frapu::RobotStateSharedPtr& state) const;
-
-    virtual bool enforceControlConstraints(std::vector<double>& control) const;
-
-    virtual void sampleRandomControl(std::vector<double>& control, std::default_random_engine* randGen, std::string& actionSamplingStrategy);
-
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
     virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;
@@ -148,11 +142,11 @@ public:
      */
     virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, std::vector<double>& observation);
     
-    std::shared_ptr<frapu::StateSpace> getStateSpace() const;
+    frapu::StateSpaceSharedPtr getStateSpace() const;
 
-    shared::ObservationSpace* getObservationSpace() const;
+    frapu::ObservationSpaceSharedPtr getObservationSpace() const;
 
-    std::shared_ptr<shared::ActionSpace> getActionSpace() const;
+    frapu::ActionSpaceSharedPtr getActionSpace() const;
 
     /*** Methods for viewer interface ***/
     virtual void setupViewer(std::string model_file, std::string environment_file);
@@ -181,20 +175,16 @@ protected:
     std::vector<double> goal_position_;
 
     double goal_radius_;    
-
-    std::vector<double> lowerControlLimits_;
-
-    std::vector<double> upperControlLimits_;
-
+    
     std::shared_ptr<Eigen::Distribution<double>> process_distribution_;
 
     std::shared_ptr<Eigen::Distribution<double>> observation_distribution_;
     
-    std::shared_ptr<frapu::StateSpace> stateSpace_;
+    frapu::StateSpaceSharedPtr stateSpace_;
 
-    std::shared_ptr<shared::ObservationSpace> observationSpace_;
+    frapu::ObservationSpaceSharedPtr observationSpace_;
 
-    std::shared_ptr<shared::ActionSpace> actionSpace_;
+    frapu::ActionSpaceSharedPtr actionSpace_;
 
     frapu::EnvironmentInfoSharedPtr environmentInfo_;
 
@@ -313,7 +303,7 @@ public:
         this->get_override("makeActionSpace")(normalizedActionSpace);
     }
 
-    bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) {
+    bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) {
         this->get_override("makeObservationSpace")(observationSpaceInfo);
     }
 

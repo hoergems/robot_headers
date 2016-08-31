@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <robot_headers/robot.hpp>
 #include "AUVPropagator.hpp"
+#include <robot_headers/DiscreteVectorActionSpace.hpp>
 
 namespace shared
 {
@@ -34,12 +35,14 @@ public:
     void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
                                      std::vector<double>& res) const override;
 
-    bool makeActionSpace(bool normalizedActionSpace) override;
+    bool makeStateSpace() override;
 
-    bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) override;
+    bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
+
+    bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) override;
 
     void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
-                                  std::vector<double>& control,
+                                  const frapu::ActionSharedPtr& control,
                                   double& duration,
                                   std::vector<Eigen::MatrixXd>& matrices) const override;
 
@@ -74,6 +77,11 @@ private:
     double dim_x_;
     double dim_y_;
     double dim_z_;
+
+    std::vector<double> lowerStateLimits_;
+    std::vector<double> upperStateLimits_;
+    std::vector<double> lowerControlLimits_;
+    std::vector<double> upperControlLimits_;
 
 };
 }

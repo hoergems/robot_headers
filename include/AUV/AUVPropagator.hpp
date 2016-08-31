@@ -19,11 +19,6 @@ public:
                                 const double& duration,
                                 const double& simulation_step_size,
                                 std::vector<double>& result) override;
-				
-    void setActionSpace(std::shared_ptr<shared::ActionSpace> &actionSpace);
-    
-private:
-    std::shared_ptr<shared::ActionSpace> actionSpace_;
     
 };
 

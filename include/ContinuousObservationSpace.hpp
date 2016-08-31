@@ -2,7 +2,7 @@
 #define __CONTINUOUS_OBSERVATION_SPACE__
 #include "ObservationSpace.hpp"
 
-namespace shared
+namespace frapu
 {
 class ContinuousObservationSpace: public ObservationSpace
 {

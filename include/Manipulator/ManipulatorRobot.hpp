@@ -16,7 +16,10 @@
 #include <rbdl_interface/rbdl_interface.hpp>
 #include <robot_headers/robot.hpp>
 #include "ManipulatorPropagator.hpp"
+#include "ManipulatorStateLimits.hpp"
 #include "Kinematics.hpp"
+#include <robot_headers/DiscreteVectorActionSpace.hpp>
+#include <robot_headers/ContinuousVectorActionSpace.hpp>
 
 using std::cout;
 using std::endl;
@@ -80,15 +83,13 @@ public:
     void getJointAxis(std::vector<std::string>& joints, std::vector<std::vector<int>>& axis);
 
     virtual void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
-                                          std::vector<double>& control,
+                                          const frapu::ActionSharedPtr& control,
                                           double& duration,
                                           std::vector<Eigen::MatrixXd>& matrices) const override;
 
     virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
-
-    virtual bool enforceConstraints(std::vector<double>& state) const override;
 
     void getJointLowerPositionLimits(std::vector<std::string>& joints, std::vector<double>& joint_limits) const;
 
@@ -122,9 +123,11 @@ public:
                                 std::vector<double>& observationError,
                                 std::vector<double>& observation) const override;
 
-    bool makeActionSpace(bool normalizedActionSpace) override;
+    bool makeStateSpace() override;
 
-    virtual bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) override;
+    bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
+
+    virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) override;
 
     virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
             std::vector<double>& res) const override;
@@ -269,6 +272,11 @@ public:
 
 
 private:
+    std::vector<double> lowerStateLimits_;
+    std::vector<double> upperStateLimits_;
+    std::vector<double> lowerControlLimits_;
+    std::vector<double> upperControlLimits_;
+
     std::vector<shared::Link> links_;
 
     std::vector<shared::Joint> joints_;

@@ -2,9 +2,9 @@
 #define __CONTINUOUS_ACTION_SPACE_HPP__
 #include "ActionSpace.hpp"
 
-namespace shared
+namespace frapu
 {
-class ContinuousActionSpace: public shared::ActionSpace
+class ContinuousActionSpace: public ActionSpace
 {
 public:
     ContinuousActionSpace(bool normalizedActionSpace);

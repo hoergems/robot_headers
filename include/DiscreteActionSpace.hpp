@@ -2,9 +2,9 @@
 #define __DISCRETE_ACTION_SPACE_HPP__
 #include "ActionSpace.hpp"
 
-namespace shared
+namespace frapu
 {
-class DiscreteActionSpace: public shared::ActionSpace
+class DiscreteActionSpace: public ActionSpace
 {
 public:
     DiscreteActionSpace(bool normalizedActionSpace);

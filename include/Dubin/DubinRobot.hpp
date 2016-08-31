@@ -17,6 +17,8 @@
 #include <rbdl_interface/rbdl_interface.hpp>
 #include <robot_headers/robot.hpp>
 #include <robot_headers/Dubin/DubinPropagator.hpp>
+#include <robot_headers/DiscreteVectorActionSpace.hpp>
+#include <robot_headers/ContinuousVectorActionSpace.hpp>
 
 using std::cout;
 using std::endl;
@@ -68,12 +70,14 @@ public:
     void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
                                      std::vector<double>& res) const override;
 
-    bool makeActionSpace(bool normalizedActionSpace) override;
+    bool makeStateSpace() override;
 
-    bool makeObservationSpace(const shared::ObservationSpaceInfo& observationSpaceInfo) override;
+    bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
+
+    bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) override;
 
     void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
-                                  std::vector<double>& control,
+                                  const frapu::ActionSharedPtr& control,
                                   double& duration,
                                   std::vector<Eigen::MatrixXd>& matrices) const override;
 
@@ -107,6 +111,11 @@ private:
     double dim_z_;
     std::vector<shared::Beacon> beacons_;
     double d_;
+
+    std::vector<double> lowerStateLimits_;
+    std::vector<double> upperStateLimits_;
+    std::vector<double> lowerControlLimits_;
+    std::vector<double> upperControlLimits_;
 
     void getLinearObservationMatrix(const std::vector<double>& state, Eigen::MatrixXd& H) const;
 
