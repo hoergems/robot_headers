@@ -9,7 +9,7 @@ class Action
 public:
     Action() {}
 
-    virtual std::unique_ptr<Action> copy() const = 0;
+    virtual frapu::ActionUniquePtr copy() const = 0;
 
     virtual void print(std::ostream& os) const = 0;
 
@@ -24,12 +24,6 @@ public:
 class VectorAction: public Action
 {
 public:
-    VectorAction():
-        Action(),
-        actionVec_() {
-
-    }
-
     VectorAction(std::vector<double>& actionValues):
         Action(),
         actionVec_(actionValues) {
@@ -42,8 +36,8 @@ public:
 
     }
 
-    virtual std::unique_ptr<Action> copy() const override {
-        std::unique_ptr<Action> copiedAction(new VectorAction(actionVec_));
+    virtual frapu::ActionUniquePtr copy() const override {
+        frapu::ActionUniquePtr copiedAction(new VectorAction(actionVec_));
         return copiedAction;
     }
 

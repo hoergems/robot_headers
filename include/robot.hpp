@@ -123,15 +123,7 @@ public:
 
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
-    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;
-
-    virtual void setStateCovarianceMatrix(Eigen::MatrixXd& state_covariance_matrix);
-
-    virtual void getStateCovarianceMatrix(Eigen::MatrixXd& state_covariance_matrix) const;
-
-    virtual void setObservationCovarianceMatrix(Eigen::MatrixXd& observation_covariance_matrix);
-
-    virtual void getObservationCovarianceMatrix(Eigen::MatrixXd& observation_covariance_matrix) const;
+    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;    
 
     std::shared_ptr<Eigen::Distribution<double>> getProcessDistribution() const;
 
@@ -166,11 +158,7 @@ protected:
 
     std::string robot_file_;
 
-    std::shared_ptr<shared::Propagator> propagator_;
-
-    Eigen::MatrixXd state_covariance_matrix_;
-
-    Eigen::MatrixXd observation_covariance_matrix_;
+    std::shared_ptr<shared::Propagator> propagator_;    
 
     std::vector<double> goal_position_;
 
