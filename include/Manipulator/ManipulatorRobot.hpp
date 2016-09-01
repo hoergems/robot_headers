@@ -18,8 +18,7 @@
 #include "ManipulatorPropagator.hpp"
 #include "ManipulatorStateLimits.hpp"
 #include "Kinematics.hpp"
-#include <robot_headers/DiscreteVectorActionSpace.hpp>
-#include <robot_headers/ContinuousVectorActionSpace.hpp>
+#include "ManipulatorSerializer.hpp"
 
 using std::cout;
 using std::endl;
@@ -56,7 +55,7 @@ struct Joint {
 class ManipulatorRobot: public Robot
 {
 public:
-    ManipulatorRobot(std::string robot_file);
+    ManipulatorRobot(std::string robotFile, std::string configFile);
 
     void getLinkNames(std::vector<std::string>& link_names);
 
@@ -108,7 +107,7 @@ public:
     void getEndEffectorJacobian(const std::vector<double>& joint_angles,
                                 std::vector<std::vector<double>>& ee_jacobian);
 
-    virtual int getStateSpaceDimension() const override;
+    int getStateSpaceDimension() const;    
 
     virtual int getDOF() const override;
 
@@ -228,8 +227,10 @@ public:
     virtual void setNewtonModel() override;
 
     void updateViewer(const frapu::RobotStateSharedPtr& state,
-                      std::vector<std::vector<double>>& particles,
+                      std::vector<frapu::RobotStateSharedPtr>& particles,
                       std::vector<std::vector<double>>& particleColors) override;
+		      
+    frapu::RobotStateSharedPtr sampleInitialState() const override;
 
 
 #ifdef USE_OPENRAVE
@@ -354,6 +355,8 @@ private:
     std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_;
 
     std::shared_ptr<shared::RBDLInterface> rbdl_interface_;
+    
+    frapu::RobotStateSharedPtr initialState_;
 };
 
 }

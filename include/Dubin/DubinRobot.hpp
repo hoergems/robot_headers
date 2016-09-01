@@ -17,8 +17,7 @@
 #include <rbdl_interface/rbdl_interface.hpp>
 #include <robot_headers/robot.hpp>
 #include <robot_headers/Dubin/DubinPropagator.hpp>
-#include <robot_headers/DiscreteVectorActionSpace.hpp>
-#include <robot_headers/ContinuousVectorActionSpace.hpp>
+#include "DubinSerializer.hpp"
 
 using std::cout;
 using std::endl;
@@ -47,12 +46,12 @@ public:
 class DubinRobot: public Robot
 {
 public:
-    DubinRobot(std::string robot_file);
+    DubinRobot(std::string robotFile, std::string configFile);
+    
+    frapu::RobotStateSharedPtr sampleInitialState() const override;
 
     void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
-                                     std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;
-
-    int getStateSpaceDimension() const override;
+                                     std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;    
 
     int getDOF() const override;
 
@@ -91,7 +90,7 @@ public:
 
 
     void updateViewer(const frapu::RobotStateSharedPtr& state,
-                      std::vector<std::vector<double>>& particles,
+                      std::vector<frapu::RobotStateSharedPtr>& particles,
                       std::vector<std::vector<double>>& particleColors) override;
 
     void setGravityConstant(double gravity_constant) override;
@@ -116,6 +115,8 @@ private:
     std::vector<double> upperStateLimits_;
     std::vector<double> lowerControlLimits_;
     std::vector<double> upperControlLimits_;
+    
+    frapu::RobotStateSharedPtr initialState_;
 
     void getLinearObservationMatrix(const std::vector<double>& state, Eigen::MatrixXd& H) const;
 

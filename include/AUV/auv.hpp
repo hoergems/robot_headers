@@ -5,19 +5,17 @@
 #include <assert.h>
 #include <robot_headers/robot.hpp>
 #include "AUVPropagator.hpp"
-#include <robot_headers/DiscreteVectorActionSpace.hpp>
+#include "AUVSerializer.hpp"
 
 namespace shared
 {
 class AUV: public Robot
 {
 public:
-    AUV(std::string robot_file);
+    AUV(std::string robotFile, std::string configFile);
 
     void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
-                                     std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;
-
-    int getStateSpaceDimension() const override;
+                                     std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;    
 
     int getDOF() const override;
 
@@ -56,7 +54,7 @@ public:
 
 
     void updateViewer(const frapu::RobotStateSharedPtr& state,
-                      std::vector<std::vector<double>>& particles,
+                      std::vector<frapu::RobotStateSharedPtr>& particles,
                       std::vector<std::vector<double>>& particleColors) override;
 
     void setGravityConstant(double gravity_constant) override;
@@ -73,6 +71,8 @@ public:
                           const frapu::ObservationSharedPtr& observation) const override;
 
     void updateRobot(const frapu::RobotStateSharedPtr& state) override;
+    
+    frapu::RobotStateSharedPtr sampleInitialState() const override;
 
 private:
     double dim_x_;
@@ -83,6 +83,8 @@ private:
     std::vector<double> upperStateLimits_;
     std::vector<double> lowerControlLimits_;
     std::vector<double> upperControlLimits_;
+    
+    frapu::RobotStateSharedPtr initialState_;
 
 };
 }

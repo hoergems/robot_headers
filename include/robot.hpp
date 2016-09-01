@@ -12,12 +12,12 @@
 #include "Distributions.hpp"
 #include "DiscreteObservationSpace.hpp"
 #include "ContinuousObservationSpace.hpp"
-#include "DiscreteActionSpace.hpp"
-#include "ContinuousActionSpace.hpp"
+#include "ActionSpace.hpp"
 #include "Action.hpp"
 #include <frapu_core/core.hpp>
 #include "RobotState.hpp"
 #include "StateSpace.hpp"
+#include "Serializer.hpp"
 
 #ifdef USE_OPENRAVE
 #include <viewer_interface/viewer_interface.hpp>
@@ -32,7 +32,7 @@ namespace shared
 class Robot: public frapu::InterfaceBase
 {
 public:
-    Robot(std::string robot_file);
+    Robot(std::string robotFile, std::string configFile);
 
     virtual ~Robot() = default;
 
@@ -51,7 +51,7 @@ public:
 
     // ******************** Virtual methods **************************
     virtual bool makeStateSpace() = 0;
-    
+
     virtual bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) = 0;
 
     virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) = 0;
@@ -65,8 +65,6 @@ public:
 
     virtual void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
             std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const = 0;
-
-    virtual int getStateSpaceDimension() const = 0;
 
     virtual int getDOF() const = 0;
 
@@ -101,17 +99,20 @@ public:
             frapu::ObservationSharedPtr& res) const = 0;
 
     virtual void updateViewer(const frapu::RobotStateSharedPtr& state,
-                              std::vector<std::vector<double>>& particles,
+                              std::vector<frapu::RobotStateSharedPtr>& particles,
                               std::vector<std::vector<double>>& particleColors) = 0;
+			      
+    virtual frapu::RobotStateSharedPtr sampleInitialState() const = 0;
 
-    //****************** End of virtual methods ************************
+
+    //****************** End of virtual methods ***********************
+    virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr) const;
+
     virtual void updateRobot(const frapu::RobotStateSharedPtr& state);
 
     virtual void setGravityConstant(double gravity_constant);
 
     void setEnvironmentInfo(frapu::EnvironmentInfoSharedPtr& environmentInfo);
-
-    virtual unsigned int getControlSpaceDimension() const;
 
     virtual void setGoalArea(std::vector<double>& goal_position, double& goal_radius);
 
@@ -123,7 +124,7 @@ public:
 
     virtual bool checkSelfCollision(std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const;
 
-    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;    
+    virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const;
 
     std::shared_ptr<Eigen::Distribution<double>> getProcessDistribution() const;
 
@@ -132,9 +133,9 @@ public:
     /**
      * Calculates the likelihood of 'observation' given 'state'
      */
-    virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state, 
+    virtual double calcLikelihood(const frapu::RobotStateSharedPtr& state,
                                   const frapu::ObservationSharedPtr& observation) const;
-    
+
     frapu::StateSpaceSharedPtr getStateSpace() const;
 
     frapu::ObservationSpaceSharedPtr getObservationSpace() const;
@@ -159,16 +160,16 @@ protected:
 
     std::string robot_file_;
 
-    std::shared_ptr<shared::Propagator> propagator_;    
+    std::shared_ptr<shared::Propagator> propagator_;
 
     std::vector<double> goal_position_;
 
-    double goal_radius_;    
-    
+    double goal_radius_;
+
     std::shared_ptr<Eigen::Distribution<double>> process_distribution_;
 
     std::shared_ptr<Eigen::Distribution<double>> observation_distribution_;
-    
+
     frapu::StateSpaceSharedPtr stateSpace_;
 
     frapu::ObservationSpaceSharedPtr observationSpace_;
@@ -176,6 +177,8 @@ protected:
     frapu::ActionSpaceSharedPtr actionSpace_;
 
     frapu::EnvironmentInfoSharedPtr environmentInfo_;
+    
+    frapu::SerializerSharedPtr serializer_;
 
 #ifdef USE_OPENRAVE
     std::shared_ptr<shared::ViewerInterface> viewer_;
@@ -187,8 +190,8 @@ protected:
 
 struct RobotWrapper: Robot, boost::python::wrapper<Robot> {
 public:
-    RobotWrapper(std::string robot_file):
-        Robot(robot_file) {
+    RobotWrapper(std::string robotFile, std::string configFile):
+        Robot(robotFile, configFile) {
 
     }
 
@@ -215,7 +218,7 @@ public:
     void createRobotCollisionObjects(const std::vector<double>& state,
                                      std::vector<std::shared_ptr<fcl::CollisionObject>>& collision_objects) const {
         this->get_override("createRobotCollisionObjects")(state, collision_objects);
-    }   
+    }
 
     void getControlLimits(std::vector<double>& lowerLimits, std::vector<double>& upperLimits) const {
         this->get_override("getControlLimits")(lowerLimits, upperLimits);

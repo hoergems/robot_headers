@@ -3,7 +3,6 @@
 #include <memory>
 #include <unistd.h>
 #include <robot_headers/propagator.hpp>
-#include <robot_headers/DiscreteActionSpace.hpp>
 
 namespace shared
 {

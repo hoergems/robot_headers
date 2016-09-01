@@ -60,8 +60,9 @@ protected:
 class StateSpace
 {
 public:
-    StateSpace():
-        stateLimits_(nullptr) {
+    StateSpace(unsigned int &dimensions):
+        stateLimits_(nullptr),
+        dimensions_(dimensions){
 
     }
 
@@ -84,11 +85,17 @@ public:
     std::shared_ptr<StateLimits> getStateLimits() const {
         return stateLimits_;
     }
+    
+    unsigned int getNumDimensions() const {
+	return dimensions_;
+    }
 
     virtual RobotStateSharedPtr sampleUniform(std::default_random_engine* randGen) const = 0;
 
 protected:
     std::shared_ptr<StateLimits> stateLimits_;
+    
+    unsigned int dimensions_;
 
 };
 
@@ -96,19 +103,14 @@ class VectorStateSpace: public StateSpace
 {
 public:
     VectorStateSpace(unsigned int dimensions):
-        StateSpace(),
-        dimensions_(dimensions) {
+        StateSpace(dimensions) {
 
     }
 
     virtual std::string getType() const override {
         std::string type = "VectorStateSpace";
         return type;
-    }
-
-    unsigned int getDimensions() const {
-        return dimensions_;
-    }
+    }    
 
     virtual RobotStateSharedPtr sampleUniform(std::default_random_engine* randGen) const override {
         std::vector<double> randomStateVec;
@@ -120,14 +122,9 @@ public:
             double rand_num = uniform_dist(*randGen);
             randomStateVec.push_back(rand_num);
         }
-        
+
         return std::make_shared<frapu::VectorState>(randomStateVec);
     }
-
-protected:
-    unsigned int dimensions_;
-
-
 };
 
 }

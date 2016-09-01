@@ -82,9 +82,9 @@ public:
 
     }
 
-    virtual void denormalizeAction(frapu::ActionSharedPtr& action) = 0;
+    virtual void denormalizeAction(const ActionSharedPtr& action, ActionSharedPtr &denormalizedAction) = 0;
 
-    virtual void operator()(frapu::ActionSharedPtr& action) = 0;
+    virtual void operator()(const ActionSharedPtr& action, ActionSharedPtr &normalizedAction) = 0;
 
     void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits) {
         actionLimits_ = actionLimits;
@@ -101,7 +101,7 @@ public:
 
     }
 
-    virtual void denormalizeAction(frapu::ActionSharedPtr& action) override {
+    virtual void denormalizeAction(const ActionSharedPtr& action, ActionSharedPtr &denormalizedAction) override {
         std::vector<double> lowerActionLimits;
         std::vector<double> upperActionLimits;
         frapu::VectorActionLimits* vecA = static_cast<frapu::VectorActionLimits*>(actionLimits_.get());
@@ -111,10 +111,10 @@ public:
             actionVec[i] = actionVec[i] * (upperActionLimits[i] - lowerActionLimits[i]) + lowerActionLimits[i];
         }
 
-        action = std::make_shared<frapu::VectorAction>(actionVec);
+        denormalizedAction = std::make_shared<frapu::VectorAction>(actionVec);
     }
 
-    virtual void operator()(frapu::ActionSharedPtr& action) override {
+    virtual void operator()(const ActionSharedPtr& action, ActionSharedPtr &normalizedAction) override {
         std::vector<double> lowerActionLimits;
         std::vector<double> upperActionLimits;
         static_cast<frapu::VectorActionLimits*>(actionLimits_.get())->getRawLimits(lowerActionLimits, upperActionLimits);
@@ -123,7 +123,7 @@ public:
             actionVec[i] = (actionVec[i] - lowerActionLimits[i]) / (upperActionLimits[i] - lowerActionLimits[i]);
         }
 
-        action = std::make_shared<frapu::VectorAction>(actionVec);
+        normalizedAction = std::make_shared<frapu::VectorAction>(actionVec);
     }
 };
 
@@ -134,12 +134,12 @@ public:
 
     }
 
-    virtual void denormalizeAction(frapu::ActionSharedPtr& action) override {
-
+    virtual void denormalizeAction(const ActionSharedPtr& action, ActionSharedPtr &denormalizedAction) override {
+	denormalizedAction = action;
     }
 
-    virtual void operator()(frapu::ActionSharedPtr& action) override {
-
+    virtual void operator()(const ActionSharedPtr& action, ActionSharedPtr &normalizedAction) override {
+	normalizedAction = action;
     }
 
 };
@@ -166,9 +166,9 @@ public:
     
     const ActionSpaceInfo getInfo() const;
 
-    void normalizeAction(frapu::ActionSharedPtr& action);
+    void normalizeAction(const ActionSharedPtr& action, ActionSharedPtr &normalizedAction);
 
-    void denormalizeAction(frapu::ActionSharedPtr& action);    
+    void denormalizeAction(const ActionSharedPtr& action, ActionSharedPtr &denormalizedAction);    
 
 protected:
     unsigned int numDimensions_;
@@ -180,6 +180,45 @@ protected:
     std::unique_ptr<normalize> actionNormalizer_;
 
 };
+
+class DiscreteActionSpace: public ActionSpace
+{
+public:
+    DiscreteActionSpace(const ActionSpaceInfo &actionSpaceInfo);
+    
+    virtual std::string getType() const override;
+    
+    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder(unsigned int &numStepsPerDimension) const = 0;
+
+};
+
+class DiscreteVectorActionSpace: public DiscreteActionSpace
+{
+public:
+    DiscreteVectorActionSpace(const ActionSpaceInfo &actionSpaceInfo);
+    
+    virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const override;
+    
+    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder(unsigned int &numStepsPerDimension) const override;
+};
+
+class ContinuousActionSpace: public ActionSpace
+{
+public:
+    ContinuousActionSpace(const ActionSpaceInfo &actionSpaceInfo);
+    
+    virtual std::string getType() const override;
+
+};
+
+class ContinuousVectorActionSpace: public ContinuousActionSpace
+{
+public:
+    ContinuousVectorActionSpace(const ActionSpaceInfo &actionSpaceInfo);
+    
+    virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const override;
+};
+
 }
 
 #endif
