@@ -4,16 +4,12 @@
 
 namespace frapu
 {
-class DubinSerializer: public Serializer
+class DubinSerializer: public VectorSerializer
 {
 public:
     DubinSerializer():
-        Serializer() {
+        VectorSerializer() {
 
-    }
-    
-    virtual frapu::RobotStateSharedPtr loadState(std::istream &is) const override {
-	
     }
     
     frapu::RobotStateSharedPtr loadInitalState(std::ifstream &is) const {

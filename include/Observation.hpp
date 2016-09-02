@@ -11,6 +11,8 @@ public:
 
     virtual frapu::ObservationUniquePtr copy() const = 0;
 
+    virtual void serialize(std::ostream& os) const = 0;
+
     virtual void print(std::ostream& os) const = 0;
 
     virtual bool equals(const Observation& otherObservation) const = 0;
@@ -40,6 +42,15 @@ public:
         frapu::ObservationUniquePtr copiedObservation(new VectorObservation(observationVec_));
         return copiedObservation;
     }
+
+    virtual void serialize(std::ostream& os) const override {
+        for (auto & k : observationVec_) {
+            os << k << " ";
+        }
+
+        os << "END";
+    }
+
 
     virtual void print(std::ostream& os) const override {
         for (auto & k : observationVec_) {

@@ -141,6 +141,8 @@ public:
     frapu::ObservationSpaceSharedPtr getObservationSpace() const;
 
     frapu::ActionSpaceSharedPtr getActionSpace() const;
+    
+    frapu::SerializerSharedPtr getSerializer() const;
 
     /*** Methods for viewer interface ***/
     virtual void setupViewer(std::string model_file, std::string environment_file);

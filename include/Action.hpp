@@ -10,6 +10,8 @@ public:
     Action() {}
 
     virtual frapu::ActionUniquePtr copy() const = 0;
+    
+    virtual void serialize(std::ostream &os) const = 0;
 
     virtual void print(std::ostream& os) const = 0;
 
@@ -18,6 +20,8 @@ public:
     virtual std::size_t hash() const = 0;
 
     virtual double distanceTo(const Action& otherAction) const = 0;
+    
+    virtual double distanceTo(const frapu::ActionSharedPtr &action) const = 0;
 
 };
 
@@ -46,6 +50,14 @@ public:
             os << k << " ";
         }
     }
+    
+    virtual void serialize(std::ostream &os) const override {
+	for (auto & k : actionVec_) {
+            os << k << " ";
+        }
+        
+        os << "END";
+    }
 
     virtual bool equals(const Action& otherAction) const override {
         std::vector<double> otherActionVec = static_cast<const VectorAction&>(otherAction).asVector();
@@ -70,6 +82,16 @@ public:
     virtual double distanceTo(const Action& otherAction) const override {
         std::vector<double> otherActionVec = static_cast<const VectorAction&>(otherAction).asVector();
         double distance = 0.0;
+        for (size_t i = 0; i < otherActionVec.size(); i++) {
+            distance += std::pow(actionVec_[i] - otherActionVec[i], 2);
+        }
+
+        return std::sqrt(distance);
+    }
+    
+    virtual double distanceTo(const frapu::ActionSharedPtr &action) const override {
+	std::vector<double> otherActionVec = static_cast<frapu::VectorAction *>(action.get())->asVector();
+	double distance = 0.0;
         for (size_t i = 0; i < otherActionVec.size(); i++) {
             distance += std::pow(actionVec_[i] - otherActionVec[i], 2);
         }

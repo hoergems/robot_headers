@@ -7,11 +7,11 @@ using std::endl;
 
 namespace frapu
 {
-class ManipulatorSerializer: public Serializer
+class ManipulatorSerializer: public VectorSerializer
 {
 public:
     ManipulatorSerializer():
-        Serializer() {
+        VectorSerializer() {
 
     }
     

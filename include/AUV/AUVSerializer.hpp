@@ -4,15 +4,11 @@
 
 namespace frapu
 {
-class AUVSerializer: public Serializer
+class AUVSerializer: public VectorSerializer
 {
 public :
     AUVSerializer():
-        Serializer() {
-    }
-    
-    virtual frapu::RobotStateSharedPtr loadState(std::istream &is) const override {
-	
+        VectorSerializer() {
     }
     
     frapu::RobotStateSharedPtr loadInitalState(std::ifstream &is) const {
