@@ -21,7 +21,8 @@ public:
     
     virtual frapu::RobotStateSharedPtr loadInitalState(std::ifstream &is) const {
 	cout << "IN LOAD INITIAL STATE" << endl;
-	frapu::RobotStateSharedPtr robotState;
+	std::vector<double> stateVec({0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+	frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(stateVec);	
 	return robotState;
     }
 

@@ -10,8 +10,8 @@ public:
     Action() {}
 
     virtual frapu::ActionUniquePtr copy() const = 0;
-    
-    virtual void serialize(std::ostream &os) const = 0;
+
+    virtual void serialize(std::ostream& os) const = 0;
 
     virtual void print(std::ostream& os) const = 0;
 
@@ -20,8 +20,8 @@ public:
     virtual std::size_t hash() const = 0;
 
     virtual double distanceTo(const Action& otherAction) const = 0;
-    
-    virtual double distanceTo(const frapu::ActionSharedPtr &action) const = 0;
+
+    virtual double distanceTo(const frapu::ActionSharedPtr& action) const = 0;
 
 };
 
@@ -50,12 +50,12 @@ public:
             os << k << " ";
         }
     }
-    
-    virtual void serialize(std::ostream &os) const override {
-	for (auto & k : actionVec_) {
+
+    virtual void serialize(std::ostream& os) const override {
+        for (auto & k : actionVec_) {
             os << k << " ";
         }
-        
+
         os << "END";
     }
 
@@ -88,10 +88,10 @@ public:
 
         return std::sqrt(distance);
     }
-    
-    virtual double distanceTo(const frapu::ActionSharedPtr &action) const override {
-	std::vector<double> otherActionVec = static_cast<frapu::VectorAction *>(action.get())->asVector();
-	double distance = 0.0;
+
+    virtual double distanceTo(const frapu::ActionSharedPtr& action) const override {
+        std::vector<double> otherActionVec = static_cast<frapu::VectorAction*>(action.get())->asVector();
+        double distance = 0.0;
         for (size_t i = 0; i < otherActionVec.size(); i++) {
             distance += std::pow(actionVec_[i] - otherActionVec[i], 2);
         }
@@ -105,6 +105,35 @@ public:
 
 protected:
     std::vector<double> actionVec_;
+
+};
+
+class DiscreteVectorAction: public VectorAction
+{
+
+public:
+    DiscreteVectorAction(std::vector< double >& actionValues):
+        VectorAction(actionValues),
+        binNumber_(0){
+
+    }
+
+    DiscreteVectorAction(const std::vector< double >& actionValues):
+        VectorAction(actionValues),
+        binNumber_(0) {
+
+    }
+    
+    long getBinNumber() const {
+	return binNumber_;
+    }
+    
+    void setBinNumber(long binNumber) {
+	binNumber_ = binNumber;
+    }
+    
+protected:
+    long binNumber_;
 
 };
 
