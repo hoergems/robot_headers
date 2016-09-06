@@ -24,7 +24,7 @@
 namespace pl = std::placeholders;
 using namespace Eigen;
 
-namespace shared
+namespace frapu
 {
 
 class Integrate: public Integrator
@@ -113,10 +113,10 @@ public:
 
     std::vector<double> getResult();
 
-    void setRBDLInterface(std::shared_ptr<shared::RBDLInterface>& rbdl_interface);
+    void setRBDLInterface(std::shared_ptr<frapu::RBDLInterface>& rbdl_interface);
 
 
-    std::shared_ptr<shared::RBDLInterface> getRBDLInterface();
+    std::shared_ptr<frapu::RBDLInterface> getRBDLInterface();
 
 private:
     MatrixXd getW0(const state_type& x, const state_type& rho, const state_type& zeta) const;
@@ -203,7 +203,7 @@ private:
 
     mutable VectorXd vel_;
 
-    std::shared_ptr<shared::RBDLInterface> rbdl_interface_;
+    std::shared_ptr<frapu::RBDLInterface> rbdl_interface_;
 
 };
 

@@ -23,7 +23,7 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
 struct Link {
@@ -47,9 +47,9 @@ struct Link {
 struct Joint {
     std::string name;
 
-    std::shared_ptr<shared::Link> parent_link;
+    std::shared_ptr<frapu::Link> parent_link;
 
-    std::shared_ptr<shared::Link> child_link;
+    std::shared_ptr<frapu::Link> child_link;
 };
 
 class ManipulatorRobot: public Robot
@@ -89,6 +89,8 @@ public:
     virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
+    
+    virtual void setupHeuristic() override;
 
     void getJointLowerPositionLimits(std::vector<std::string>& joints, std::vector<double>& joint_limits) const;
 
@@ -278,9 +280,9 @@ private:
     std::vector<double> lowerControlLimits_;
     std::vector<double> upperControlLimits_;
 
-    std::vector<shared::Link> links_;
+    std::vector<frapu::Link> links_;
 
-    std::vector<shared::Joint> joints_;
+    std::vector<frapu::Joint> joints_;
 
     std::vector<std::string> link_names_;
 
@@ -340,7 +342,7 @@ private:
 
     std::vector<double> process_origin_(TiXmlElement* xml);
 
-    std::shared_ptr<shared::Kinematics> kinematics_;
+    std::shared_ptr<Kinematics> kinematics_;
 
     void quatFromRPY(double& roll, double& pitch, double& y, std::vector<double>& quat);
 
@@ -354,7 +356,7 @@ private:
      */
     std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_;
 
-    std::shared_ptr<shared::RBDLInterface> rbdl_interface_;
+    std::shared_ptr<frapu::RBDLInterface> rbdl_interface_;
     
     frapu::RobotStateSharedPtr initialState_;
 };

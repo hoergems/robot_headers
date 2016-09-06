@@ -1,7 +1,8 @@
 #ifndef __HOMECARE_HPP__
 #define __HOMECARE_HPP__
 #include <robot_headers/robot.hpp>
-namespace shared
+
+namespace frapu
 {
 class Homecare: public Homecare
 {

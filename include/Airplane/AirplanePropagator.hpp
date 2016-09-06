@@ -3,7 +3,7 @@
 #include <robot_headers/propagator.hpp>
 #include <robot_headers/Airplane/AirplaneIntegrator.hpp>
 
-namespace shared
+namespace frapu
 {
 class AirplanePropagator: public Propagator
 {
@@ -17,10 +17,10 @@ public:
                                 const double& simulation_step_size,
                                 std::vector<double>& result) override;
 
-    std::shared_ptr<shared::AirplaneIntegrator> getIntegrator() const;
+    std::shared_ptr<AirplaneIntegrator> getIntegrator() const;
 
 private:
-    std::shared_ptr<shared::AirplaneIntegrator> integrator_;
+    std::shared_ptr<AirplaneIntegrator> integrator_;
 
 };
 

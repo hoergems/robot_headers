@@ -46,6 +46,7 @@ public:
     }
     
     virtual double operator()(frapu::HeuristicInfoSharedPtr &heuristicInfo) const override {
+	cout << "Calling RRT heuristic" << endl;
 	return 0.0;
     }
 };

@@ -8,7 +8,7 @@
 #include <robot_headers/propagator.hpp>
 #include <robot_headers/Manipulator/ManipulatorIntegrator.hpp>
 
-namespace shared
+namespace frapu
 {
 
 class ManipulatorPropagator: public Propagator

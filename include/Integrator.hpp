@@ -2,7 +2,7 @@
 #define __INTEGRATOR_HPP__
 #include <vector>
 
-namespace shared
+namespace frapu
 {
 
 typedef std::vector<double> state_type;

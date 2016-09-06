@@ -2,7 +2,7 @@
 #define __MANIPULATOR_STATE_LIMITS__
 #include <robot_headers/StateSpace.hpp>
 
-namespace shared
+namespace frapu
 {
 class ManipulatorStateLimits: public frapu::VectorStateLimits
 {

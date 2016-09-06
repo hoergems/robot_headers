@@ -3,7 +3,7 @@
 #include <vector>
 #include "utils.hpp"
 
-namespace shared
+namespace frapu
 {
 class Propagator
 {

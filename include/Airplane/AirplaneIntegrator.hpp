@@ -25,7 +25,7 @@ namespace pl = std::placeholders;
 using namespace Eigen;
 using namespace boost::numeric::odeint;
 
-namespace shared
+namespace frapu
 {
 class AirplaneIntegrator: public Integrator
 {

@@ -7,7 +7,7 @@
 #include "AUVPropagator.hpp"
 #include "AUVSerializer.hpp"
 
-namespace shared
+namespace frapu
 {
 class AUV: public Robot
 {
@@ -73,6 +73,8 @@ public:
     void updateRobot(const frapu::RobotStateSharedPtr& state) override;
     
     frapu::RobotStateSharedPtr sampleInitialState() const override;
+    
+    virtual void setupHeuristic() override;
 
 private:
     double dim_x_;

@@ -11,7 +11,7 @@
 #include <Eigen/Dense>
 #include <boost/timer.hpp>
 
-namespace shared {
+namespace frapu {
 
     class Kinematics {
         public:

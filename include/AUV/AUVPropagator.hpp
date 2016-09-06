@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <robot_headers/propagator.hpp>
 
-namespace shared
+namespace frapu
 {
 
 class AUVPropagator: public Propagator

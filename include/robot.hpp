@@ -26,7 +26,7 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
 class Robot: public frapu::InterfaceBase
@@ -103,10 +103,13 @@ public:
                               std::vector<std::vector<double>>& particleColors) = 0;
 			      
     virtual frapu::RobotStateSharedPtr sampleInitialState() const = 0;
-
+    
+    virtual void setupHeuristic() = 0;
 
     //****************** End of virtual methods ***********************
-    virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr) const;
+    virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr &heuristicInfo) const;
+    
+    frapu::HeuristicSharedPtr getHeuristic() const;
 
     virtual void updateRobot(const frapu::RobotStateSharedPtr& state);
 
@@ -162,7 +165,7 @@ protected:
 
     std::string robot_file_;
 
-    std::shared_ptr<shared::Propagator> propagator_;
+    std::shared_ptr<frapu::Propagator> propagator_;
 
     std::vector<double> goal_position_;
 
@@ -181,9 +184,11 @@ protected:
     frapu::EnvironmentInfoSharedPtr environmentInfo_;
     
     frapu::SerializerSharedPtr serializer_;
+    
+    frapu::HeuristicSharedPtr heuristic_;
 
 #ifdef USE_OPENRAVE
-    std::shared_ptr<shared::ViewerInterface> viewer_;
+    std::shared_ptr<frapu::ViewerInterface> viewer_;
 #else
     std::shared_ptr<double> viewer_;
 #endif

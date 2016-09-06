@@ -22,7 +22,7 @@
 using std::cout;
 using std::endl;
 
-namespace shared
+namespace frapu
 {
 
 struct Beacon {
@@ -102,13 +102,15 @@ public:
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
             Eigen::MatrixXd& covariance_matrix,
             unsigned long seed) override;
+	    
+    virtual void setupHeuristic() override;
 
 private:
 
     double dim_x_;
     double dim_y_;
     double dim_z_;
-    std::vector<shared::Beacon> beacons_;
+    std::vector<Beacon> beacons_;
     double d_;
 
     std::vector<double> lowerStateLimits_;

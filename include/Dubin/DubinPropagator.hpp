@@ -7,7 +7,7 @@
 #include <iostream>
 #include <robot_headers/propagator.hpp>
 
-namespace shared
+namespace frapu
 {
 
 typedef std::vector<double> state_type;
