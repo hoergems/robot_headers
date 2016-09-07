@@ -25,6 +25,16 @@ using std::endl;
 
 namespace frapu
 {
+struct RRTOptions {
+    RRTOptions() {
+	
+    }
+    
+    bool continuousCollision;
+    
+    double planningVelocity;
+
+};
 
 struct Link {
     std::string name;
@@ -89,8 +99,8 @@ public:
     virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
-    
-    virtual void setupHeuristic() override;
+
+    virtual void setupHeuristic(frapu::RewardModelSharedPtr& rewardModel) override;
 
     void getJointLowerPositionLimits(std::vector<std::string>& joints, std::vector<double>& joint_limits) const;
 
@@ -109,7 +119,7 @@ public:
     void getEndEffectorJacobian(const std::vector<double>& joint_angles,
                                 std::vector<std::vector<double>>& ee_jacobian);
 
-    int getStateSpaceDimension() const;    
+    int getStateSpaceDimension() const;
 
     virtual int getDOF() const override;
 
@@ -231,7 +241,7 @@ public:
     void updateViewer(const frapu::RobotStateSharedPtr& state,
                       std::vector<frapu::RobotStateSharedPtr>& particles,
                       std::vector<std::vector<double>>& particleColors) override;
-		      
+
     frapu::RobotStateSharedPtr sampleInitialState() const override;
 
 
@@ -357,8 +367,10 @@ private:
     std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_;
 
     std::shared_ptr<frapu::RBDLInterface> rbdl_interface_;
-    
+
     frapu::RobotStateSharedPtr initialState_;
+    
+    RRTOptions rrtOptions;
 };
 
 }

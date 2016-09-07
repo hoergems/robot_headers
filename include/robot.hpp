@@ -104,10 +104,11 @@ public:
 			      
     virtual frapu::RobotStateSharedPtr sampleInitialState() const = 0;
     
-    virtual void setupHeuristic() = 0;
+    virtual void setupHeuristic(frapu::RewardModelSharedPtr &rewardModel) = 0;
 
     //****************** End of virtual methods ***********************
     virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr &heuristicInfo) const;
+    
     
     frapu::HeuristicSharedPtr getHeuristic() const;
 
@@ -118,6 +119,8 @@ public:
     void setEnvironmentInfo(frapu::EnvironmentInfoSharedPtr& environmentInfo);
 
     virtual void setGoalArea(std::vector<double>& goal_position, double& goal_radius);
+    
+    virtual void getGoalArea(std::vector<double> &goalArea) const;
 
     virtual void setNewtonModel();
 
@@ -146,6 +149,16 @@ public:
     frapu::ActionSpaceSharedPtr getActionSpace() const;
     
     frapu::SerializerSharedPtr getSerializer() const;
+    
+    std::vector<frapu::RobotStateSharedPtr> getGoalStates() const;
+    
+    void setGoalStates(std::vector<frapu::RobotStateSharedPtr> &goalStates);
+    
+    void setControlDuration(double control_duration);
+    
+    double getControlDuration() const;
+    
+    std::vector<frapu::RobotStateSharedPtr> loadGoalStatesFromFile(std::string &filename) const;
 
     /*** Methods for viewer interface ***/
     virtual void setupViewer(std::string model_file, std::string environment_file);
@@ -168,8 +181,12 @@ protected:
     std::shared_ptr<frapu::Propagator> propagator_;
 
     std::vector<double> goal_position_;
+    
+    std::vector<frapu::RobotStateSharedPtr> goalStates_;
 
     double goal_radius_;
+    
+    double control_duration_;
 
     std::shared_ptr<Eigen::Distribution<double>> process_distribution_;
 

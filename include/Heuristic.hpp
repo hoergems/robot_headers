@@ -1,6 +1,8 @@
 #ifndef __HEURISTIC_HPP__
 #define __HEURISTIC_HPP__
 #include <frapu_core/core.hpp>
+#include "trajectory.hpp"
+#include "RewardModel.hpp"
 
 namespace frapu
 {
@@ -8,7 +10,10 @@ namespace frapu
 class HeuristicInfo
 {
 public:
-    HeuristicInfo() {
+    HeuristicInfo():
+        currentBelief(nullptr),
+        currentState(nullptr),
+        rewardModel(nullptr) {
 
     }
 
@@ -16,17 +21,20 @@ public:
 
     frapu::RobotStateSharedPtr currentState;
 
+    frapu::RewardModelSharedPtr rewardModel;
+
 };
 
-/**class RRTHeuristicInfo: public HeuristicInfo {
+class RRTHeuristicInfo: public HeuristicInfo
+{
 public:
-    RRTHeuristicInfo() {
+    RRTHeuristicInfo():
+        HeuristicInfo() {
 
     }
 
-    frapu::RobotStateSharedPtr currentState = nullptr;
-
-};*/
+    double rrtTimeout = 10.0;
+};
 
 class Heuristic
 {
@@ -35,31 +43,42 @@ public:
 
     }
 
-    virtual double operator()(frapu::HeuristicInfoSharedPtr& heuristicInfo) const = 0;
+    virtual double operator()(frapu::HeuristicInfoSharedPtr& heuristicInfo) const = 0;    
 
 };
 
 class RRTHeuristic: public Heuristic
 {
 public:
-    RRTHeuristic():
+    RRTHeuristic(frapu::PathPlannerSharedPtr &pathPlanner):
         Heuristic(),
-        pathPlanner_(nullptr) {
+        pathPlanner_(pathPlanner){
 
     }
 
-    virtual double operator()(frapu::HeuristicInfoSharedPtr& heuristicInfo) const override {
-        cout << "Calling RRT heuristic" << endl;
-	double timeout = 1000;
-	pathPlanner_->solve(heuristicInfo->currentState, 1000);
+    virtual double operator()(frapu::HeuristicInfoSharedPtr& heuristicInfo) const override {	
+	if (!pathPlanner_) {
+	    cout << "Path planner is null!!!!" << endl;
+	}
+	
+	if (!heuristicInfo->currentState) {
+	    cout << "CURRENT STATE IS NULL!!!" << endl;
+	}
+	
+	if (!heuristicInfo->rewardModel) {
+	    cout << "Warning: Reward model is nullptr. Did you forget to set a reward model in your HeuristicInfo? Returning 0.0" << endl;
+	    return 0.0;
+	} 
+	
+	frapu::RewardModelSharedPtr rewardModel = heuristicInfo->rewardModel;
+        	
+        frapu::TrajectorySharedPtr trajectory =
+            pathPlanner_->solve(heuristicInfo->currentState, static_cast<RRTHeuristicInfo*>(heuristicInfo.get())->rrtTimeout);
         return 0.0;
     }
     
-    virtual void setPathPlanner(frapu::PathPlannerSharedPtr &pathPlanner) {
-	pathPlanner_ = pathPlanner;
-    }
-
-private:
+    
+protected:
     frapu::PathPlannerSharedPtr pathPlanner_;
 };
 

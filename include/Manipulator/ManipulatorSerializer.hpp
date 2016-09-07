@@ -25,6 +25,18 @@ public:
 	frapu::RobotStateSharedPtr robotState = std::make_shared<frapu::VectorState>(stateVec);	
 	return robotState;
     }
+    
+    virtual bool loadContinuousCollision(std::ifstream &is) const {
+	return true;
+    }
+    
+    virtual double loadPlanningVelocity(std::ifstream &is) const {
+	return 3.0;
+    }
+    
+    virtual double loadControlDuration(std::ifstream &is) const {
+	return 0.001;
+    }
 
 };
 }

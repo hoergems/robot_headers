@@ -9,10 +9,10 @@ using std::endl;
 namespace robotutils
 {
 
-inline frapu::HeuristicSharedPtr makeRRTHeuristic() {
+/**inline frapu::HeuristicSharedPtr makeRRTHeuristic() {
     std::shared_ptr<frapu::RRTHeuristic> heuristic = std::make_shared<frapu::RRTHeuristic>();    
     return heuristic;
-};
+};*/
 
 }
 

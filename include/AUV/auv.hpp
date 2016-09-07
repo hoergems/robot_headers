@@ -74,7 +74,7 @@ public:
     
     frapu::RobotStateSharedPtr sampleInitialState() const override;
     
-    virtual void setupHeuristic() override;
+    virtual void setupHeuristic(frapu::RewardModelSharedPtr &rewardModel) override;
 
 private:
     double dim_x_;
