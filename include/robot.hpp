@@ -1,6 +1,5 @@
 #ifndef ROBOT_INTERFACE_HPP_
 #define ROBOT_INTERFACE_HPP_
-#include <boost/python.hpp>
 #include <boost/thread.hpp>
 #include <Eigen/Dense>
 #include "fcl/BV/BV.h"
@@ -18,6 +17,7 @@
 #include "RobotState.hpp"
 #include "StateSpace.hpp"
 #include "Serializer.hpp"
+#include "propagator.hpp"
 
 #ifdef USE_OPENRAVE
 #include <viewer_interface/viewer_interface.hpp>
@@ -107,6 +107,10 @@ public:
     virtual void setupHeuristic(frapu::RewardModelSharedPtr &rewardModel) = 0;
 
     //****************** End of virtual methods ***********************
+    virtual void makeGoal();
+    
+    frapu::GoalSharedPtr getGoal() const;
+    
     virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr &heuristicInfo) const;
     
     
@@ -203,6 +207,8 @@ protected:
     frapu::SerializerSharedPtr serializer_;
     
     frapu::HeuristicSharedPtr heuristic_;
+    
+    frapu::GoalSharedPtr goal_;
 
 #ifdef USE_OPENRAVE
     std::shared_ptr<frapu::ViewerInterface> viewer_;
@@ -212,7 +218,7 @@ protected:
 
 };
 
-struct RobotWrapper: Robot, boost::python::wrapper<Robot> {
+/**struct RobotWrapper: Robot, boost::python::wrapper<Robot> {
 public:
     RobotWrapper(std::string robotFile, std::string configFile):
         Robot(robotFile, configFile) {
@@ -357,7 +363,7 @@ public:
         this->get_override("calcLikelihood")(state, observation);
     }
 
-};
+};*/
 
 }
 

@@ -3,8 +3,6 @@
 #include <string>
 #include <iostream>
 #include <assert.h>
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/make_shared.hpp>
 #include "fcl/BV/BV.h"
@@ -70,6 +68,8 @@ public:
                                      frapu::ObservationSharedPtr& res) const override;
 
     bool makeStateSpace() override;
+    
+    void makeGoal() override;
 
     bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
 

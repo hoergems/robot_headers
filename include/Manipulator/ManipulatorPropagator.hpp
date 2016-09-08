@@ -2,8 +2,6 @@
 #define MANIPULATOR_PROPAGATOR_HPP_
 #include <Eigen/Dense>
 #include <boost/timer.hpp>
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <iostream>
 #include <robot_headers/propagator.hpp>
 #include <robot_headers/Manipulator/ManipulatorIntegrator.hpp>

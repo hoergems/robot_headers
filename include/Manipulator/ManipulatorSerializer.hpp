@@ -27,11 +27,11 @@ public:
     }
     
     virtual bool loadContinuousCollision(std::ifstream &is) const {
-	return true;
+	return false;
     }
     
     virtual double loadPlanningVelocity(std::ifstream &is) const {
-	return 3.0;
+	return 4.0;
     }
     
     virtual double loadControlDuration(std::ifstream &is) const {

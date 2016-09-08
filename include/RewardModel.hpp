@@ -19,6 +19,8 @@ public:
     double stepPenalty = 1.0;
     
     double exitReward = 1000.0;
+    
+    double discountFactor = 0.99;
 
 };
 

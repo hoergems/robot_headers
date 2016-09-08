@@ -3,8 +3,6 @@
 #include <string>
 #include <iostream>
 #include <assert.h>
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/algorithm/string.hpp>
 #include "fcl/BV/BV.h"
 #include "fcl/collision_object.h"
@@ -101,6 +99,8 @@ public:
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual void setupHeuristic(frapu::RewardModelSharedPtr& rewardModel) override;
+    
+    virtual void makeGoal() override;
 
     void getJointLowerPositionLimits(std::vector<std::string>& joints, std::vector<double>& joint_limits) const;
 
@@ -198,10 +198,6 @@ public:
     virtual bool checkSelfCollision(std::vector<std::shared_ptr<fcl::CollisionObject>>& collision_objects) const override;
 
     virtual bool checkSelfCollision(const frapu::RobotStateSharedPtr& state) const override;
-
-    bool checkSelfCollisionPy(boost::python::list& ns);
-
-    //std::vector<fcl::AABB> createRobotCollisionStructuresPy(const std::vector<double> &joint_angles);
 
     /**
      * Set the gravity constant

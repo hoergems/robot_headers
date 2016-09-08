@@ -34,6 +34,8 @@ public:
                                      frapu::ObservationSharedPtr& res) const override;
 
     bool makeStateSpace() override;
+    
+    void makeGoal() override;
 
     bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
 
