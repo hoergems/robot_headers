@@ -4,7 +4,7 @@
 
 namespace frapu
 {
-class Homecare: public Homecare
+class Homecare: public Robot
 {
 public:
     Homecare();
