@@ -104,17 +104,12 @@ public:
 			      
     virtual frapu::RobotStateSharedPtr sampleInitialState() const = 0;
     
-    virtual void setupHeuristic(frapu::RewardModelSharedPtr &rewardModel) = 0;
+    virtual frapu::HeuristicFunctionSharedPtr makeHeuristicFunction() const = 0;
 
     //****************** End of virtual methods ***********************
     virtual void makeGoal();
     
     frapu::GoalSharedPtr getGoal() const;
-    
-    virtual double getHeuristicValue(frapu::HeuristicInfoSharedPtr &heuristicInfo) const;
-    
-    
-    frapu::HeuristicSharedPtr getHeuristic() const;
 
     virtual void updateRobot(const frapu::RobotStateSharedPtr& state);
 
@@ -205,8 +200,6 @@ protected:
     frapu::EnvironmentInfoSharedPtr environmentInfo_;
     
     frapu::SerializerSharedPtr serializer_;
-    
-    frapu::HeuristicSharedPtr heuristic_;
     
     frapu::GoalSharedPtr goal_;
 

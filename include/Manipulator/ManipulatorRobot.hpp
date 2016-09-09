@@ -98,7 +98,7 @@ public:
 
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
 
-    virtual void setupHeuristic(frapu::RewardModelSharedPtr& rewardModel) override;
+    virtual frapu::HeuristicFunctionSharedPtr makeHeuristicFunction() const override;
     
     virtual void makeGoal() override;
 

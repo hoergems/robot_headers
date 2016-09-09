@@ -103,7 +103,7 @@ public:
             Eigen::MatrixXd& covariance_matrix,
             unsigned long seed) override;
 	    
-    virtual void setupHeuristic(frapu::RewardModelSharedPtr &rewardModel) override;
+    virtual frapu::HeuristicFunctionSharedPtr makeHeuristicFunction() const override;
 
 private:
 

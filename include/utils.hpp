@@ -1,7 +1,6 @@
 #ifndef __ROBOT_UTILS_HPP_
 #define __ROBOT_UTILS_HPP_
 #include <iostream>
-#include "Heuristic.hpp"
 
 using std::cout;
 using std::endl;
