@@ -81,9 +81,7 @@ public:
             Eigen::MatrixXd& H,
             Eigen::MatrixXd& W) const = 0;
 
-    virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const = 0;
-
-    virtual bool isValid(const frapu::RobotStateSharedPtr& state) const;
+    virtual bool isTerminal(const frapu::RobotStateSharedPtr& state) const = 0;    
 
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const = 0;
 
@@ -107,6 +105,8 @@ public:
     virtual frapu::HeuristicFunctionSharedPtr makeHeuristicFunction() const = 0;
 
     //****************** End of virtual methods ***********************
+    virtual bool isValid(const frapu::RobotStateSharedPtr& state) const;
+    
     virtual void makeGoal();
     
     frapu::GoalSharedPtr getGoal() const;
