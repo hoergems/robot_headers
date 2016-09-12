@@ -16,6 +16,10 @@ public:
     virtual void serialize(std::ostream& os) const = 0;
 
     virtual void print(std::ostream& os) const = 0;
+    
+    virtual std::ostream& operator<< (std::ostream & out) const {
+        print(out);
+    }
 
     virtual bool equals(frapu::RobotStateSharedPtr& otherState) const = 0;
 
@@ -75,8 +79,7 @@ public:
         os << "END";
     }
 
-    virtual void print(std::ostream& os) const override {
-        os << "VectorState: ";
+    virtual void print(std::ostream& os) const override {        
         for (size_t i = 0; i < state_.size(); i++) {
             os << state_[i] << " ";
         }

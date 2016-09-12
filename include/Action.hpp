@@ -14,6 +14,10 @@ public:
     virtual void serialize(std::ostream& os) const = 0;
 
     virtual void print(std::ostream& os) const = 0;
+    
+    virtual std::ostream& operator<< (std::ostream & out) const {
+        print(out);
+    }
 
     virtual bool equals(const Action& otherAction) const = 0;
 
