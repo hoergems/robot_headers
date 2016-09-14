@@ -20,6 +20,8 @@ struct ActionSpaceInfo {
     std::string type = "discrete";
     
     bool normalized = false;
+    
+    unsigned int numStepsPerDimension = 2;
 };
 
 class ActionLimits
@@ -158,7 +160,7 @@ public:
 
     void setNumDimensions(unsigned int& numDimensions);
 
-    void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits);
+    virtual void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits);
 
     frapu::ActionLimitsSharedPtr getActionLimits() const;
 
@@ -188,7 +190,9 @@ public:
     
     virtual std::string getType() const override;
     
-    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder(unsigned int &numStepsPerDimension) const = 0;
+    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder() const = 0;
+    
+    virtual frapu::ActionSharedPtr getAction(unsigned int &index) const = 0;
 
 };
 
@@ -199,7 +203,19 @@ public:
     
     virtual ActionSharedPtr sampleUniform(std::default_random_engine* randGen) const override;
     
-    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder(unsigned int &numStepsPerDimension) const override;
+    virtual std::vector<frapu::ActionSharedPtr> getAllActionsInOrder() const override;
+    
+    virtual void setActionLimits(frapu::ActionLimitsSharedPtr& actionLimits) override;
+    
+    virtual frapu::ActionSharedPtr getAction(unsigned int &index) const override;
+    
+protected:
+    ActionSpaceInfo actionSpaceInfo_;
+    
+    std::vector<frapu::ActionSharedPtr> allActionsOrdered_;
+    
+    void makeAllActionsInOrder(const unsigned int &numStepsPerDimension);
+    
 };
 
 class ContinuousActionSpace: public ActionSpace

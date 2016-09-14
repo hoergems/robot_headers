@@ -118,7 +118,7 @@ class DiscreteVectorAction: public VectorAction
 public:
     DiscreteVectorAction(std::vector< double >& actionValues):
         VectorAction(actionValues),
-        binNumber_(0){
+        binNumber_(std::numeric_limits<long>::max()){
 
     }
 
