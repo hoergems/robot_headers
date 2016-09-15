@@ -134,9 +134,9 @@ public:
                                 std::vector<double>& observationError,
                                 frapu::ObservationSharedPtr& observation) const override;
 
-    bool makeStateSpace() override;
+    virtual bool makeStateSpace() override;
 
-    bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
+    virtual bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) override;
 
     virtual bool makeObservationSpace(const frapu::ObservationSpaceInfo& observationSpaceInfo) override;
 
@@ -223,22 +223,15 @@ public:
      * Gets the end-effector velocity for a given state
      */
     void getEndEffectorVelocity(std::vector<double>& state,
-                                std::vector<double>& ee_velocity);
-
-    /**
-     * Gets the process matrices in vector form for state x,
-     * control rho and control duration t_e
-     */
-    std::vector<double> getProcessMatrices(std::vector<double>& x,
-                                           std::vector<double>& rho,
-                                           double t_e);
+                                std::vector<double>& ee_velocity);   
+    
     virtual void setNewtonModel() override;
 
-    void updateViewer(const frapu::RobotStateSharedPtr& state,
+    virtual void updateViewer(const frapu::RobotStateSharedPtr& state,
                       std::vector<frapu::RobotStateSharedPtr>& particles,
                       std::vector<std::vector<double>>& particleColors) override;
 
-    frapu::RobotStateSharedPtr sampleInitialState() const override;
+    virtual frapu::RobotStateSharedPtr sampleInitialState() const override;
 
 
 #ifdef USE_OPENRAVE
@@ -278,14 +271,17 @@ public:
                           std::vector<double>& diffuse_color,
                           std::vector<double>& ambient_color);
 #endif
-
-
-private:
+protected:
+    std::shared_ptr<Kinematics> kinematics_;
+    
+    std::vector<frapu::CollisionObjectSharedPtr> collision_objects_;
+    
     std::vector<double> lowerStateLimits_;
     std::vector<double> upperStateLimits_;
     std::vector<double> lowerControlLimits_;
     std::vector<double> upperControlLimits_;
 
+private:
     std::vector<frapu::Link> links_;
 
     std::vector<frapu::Joint> joints_;
@@ -346,9 +342,7 @@ private:
 
     unsigned int get_link_index(std::string& link_name);
 
-    std::vector<double> process_origin_(TiXmlElement* xml);
-
-    std::shared_ptr<Kinematics> kinematics_;
+    std::vector<double> process_origin_(TiXmlElement* xml);    
 
     void quatFromRPY(double& roll, double& pitch, double& y, std::vector<double>& quat);
 
@@ -357,10 +351,8 @@ private:
      */
     void initCollisionObjects();
 
-    /**
-     * A vector holding the collision objects of the active links
-     */
-    std::vector<std::shared_ptr<fcl::CollisionObject>> collision_objects_;
+    
+    
 
     std::shared_ptr<frapu::RBDLInterface> rbdl_interface_;
 
