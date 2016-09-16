@@ -10,6 +10,8 @@ class Homecare: public Robot
 public:
     Homecare(std::string robotFile, std::string configFile);
     
+    virtual std::string getName() const override;
+    
     virtual bool propagateState(const frapu::RobotStateSharedPtr& state,
                                 const frapu::ActionSharedPtr& action,
                                 double duration,
@@ -60,12 +62,10 @@ public:
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const override;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) override;
+                                         Eigen::MatrixXd& covariance_matrix) override;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) override;
+            Eigen::MatrixXd& covariance_matrix) override;
 
     virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
             frapu::ObservationSharedPtr& res) const override;

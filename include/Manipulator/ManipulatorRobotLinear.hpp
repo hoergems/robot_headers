@@ -10,6 +10,8 @@ class ManipulatorRobotLinear: public ManipulatorRobot
 {
 public:
     ManipulatorRobotLinear(std::string robotFile, std::string configFile);
+    
+    virtual std::string getName() const override;
 
     virtual void getLinearProcessMatrices(const frapu::RobotStateSharedPtr& state,
                                           const frapu::ActionSharedPtr& control,

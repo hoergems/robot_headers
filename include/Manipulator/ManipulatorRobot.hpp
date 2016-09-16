@@ -64,6 +64,8 @@ class ManipulatorRobot: public Robot
 {
 public:
     ManipulatorRobot(std::string robotFile, std::string configFile);
+    
+    virtual std::string getName() const override;
 
     void getLinkNames(std::vector<std::string>& link_names);
 

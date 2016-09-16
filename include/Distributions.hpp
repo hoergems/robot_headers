@@ -55,7 +55,8 @@ namespace internal
 {
 template<typename Scalar>
 struct scalar_dist_op {
-    static std::mt19937 rng;                        // The uniform pseudo-random algorithm
+    mutable std::default_random_engine rng;
+    //std::mt19937 rng;                        // The uniform pseudo-random algorithm
     mutable std::normal_distribution<Scalar> norm; // gaussian combinator
     mutable std::uniform_real_distribution<double> real_distr;
 
@@ -64,6 +65,10 @@ struct scalar_dist_op {
     template<typename Index>
     inline const Scalar operator()(Index, Index = 0) const {
         return norm(rng);
+    }
+    
+    inline void setRNG(std::default_random_engine &randomEngine) {
+        rng = randomEngine;
     }
 
     inline void seed(const uint64_t& s) {
@@ -75,8 +80,8 @@ struct scalar_dist_op {
     }
 };
 
-template<typename Scalar>
-std::mt19937 scalar_dist_op<Scalar>::rng;
+//template<typename Scalar>
+//std::mt19937 scalar_dist_op<Scalar>::rng;
 
 /**template<typename Scalar>
 struct functor_traits<scalar_dist_op<Scalar> > {
@@ -95,15 +100,15 @@ template<typename Scalar>
 class Distribution
 {
 public:
+    Distibution(const std::default_random_engine &randomEngine) {
+        randN.setRNG(randomEngine);
+    }
+    
     Matrix< Scalar, Dynamic, 1> _mean;
 
     Matrix<Scalar, Dynamic, Dynamic> _covar;
 
     Matrix<Scalar, Dynamic, Dynamic> _covar_inverse;
-
-    uint64_t _seed;
-
-    Distribution() {};
 
     virtual Eigen::Matrix < Scalar, Eigen::Dynamic, -1 > samples(int nn) = 0;
 
@@ -127,8 +132,8 @@ template<typename Scalar>
 class UniformDistribution: public Distribution<Scalar>
 {
 public:
-    UniformDistribution():
-        Distribution<Scalar>() {
+    UniformDistribution(const std::default_random_engine &randomEngine):
+        Distribution<Scalar>(randomEngine) {
 
     }
 };
@@ -137,8 +142,8 @@ template<typename Scalar>
 class WeightedDiscreteDistribution: public Distribution<Scalar>
 {
 public:
-    WeightedDiscreteDistribution():
-        Distribution<Scalar>(),
+    WeightedDiscreteDistribution(const std::default_random_engine &randomEngine):
+        Distribution<Scalar>(randomEngine),
         weightedElements_(),
         weights_(),
         hashValues_() {
@@ -252,15 +257,13 @@ class EigenMultivariateNormal: public Distribution<Scalar>
 
 public:
     EigenMultivariateNormal(const Matrix<Scalar, Dynamic, 1>& mean, const Matrix<Scalar, Dynamic, Dynamic>& covar,
-                            const bool use_cholesky = false, const uint64_t& seed = std::mt19937::default_seed):
-        Distribution<Scalar>(),
+                            const std::default_random_engine &randomEngine,
+                            const bool use_cholesky = false):
+        Distribution<Scalar>(randomEngine),
         normal_dist_term1_(0.0),
-        _use_cholesky(use_cholesky) {
-        this->randN.seed(seed);
+        _use_cholesky(use_cholesky) {        
         this->setMean(mean);
         setCovar(covar);
-        this->_seed = seed;
-
         double det = covar.determinant();
         normal_dist_term1_ = 1.0 / std::sqrt(std::pow(2.0 * M_PI, covar.rows()) * det);
     }
@@ -306,7 +309,7 @@ public:
 
     /// Draw nn samples from the gaussian and return them
     /// as columns in a Dynamic by nn matrix
-    Matrix < Scalar, Dynamic, -1 > samples(int nn) {
+    Matrix < Scalar, Dynamic, -1 > samples(int nn) override{
         return (_transform * Matrix < Scalar, Dynamic, -1 >::NullaryExpr(this->_covar.rows(), nn, this->randN)).colwise() + this->_mean;
     }
 }; // end class EigenMultivariateNormal

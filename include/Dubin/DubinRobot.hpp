@@ -46,6 +46,8 @@ class DubinRobot: public Robot
 public:
     DubinRobot(std::string robotFile, std::string configFile);
     
+    virtual std::string getName() const override;
+    
     frapu::RobotStateSharedPtr sampleInitialState() const override;
 
     void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
@@ -96,12 +98,10 @@ public:
     void setGravityConstant(double gravity_constant) override;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) override;
+                                         Eigen::MatrixXd& covariance_matrix) override;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) override;
+            Eigen::MatrixXd& covariance_matrix) override;
 	    
     virtual frapu::HeuristicFunctionSharedPtr makeHeuristicFunction() const override;
 

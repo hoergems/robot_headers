@@ -50,6 +50,8 @@ public:
                                 frapu::RobotStateSharedPtr& result);
 
     // ******************** Virtual methods **************************
+    virtual std::string getName() const = 0;
+    
     virtual bool makeStateSpace() = 0;
 
     virtual bool makeActionSpace(const frapu::ActionSpaceInfo& actionSpaceInfo) = 0;
@@ -86,12 +88,10 @@ public:
     virtual double distanceGoal(const frapu::RobotStateSharedPtr& state) const = 0;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) = 0;
+                                         Eigen::MatrixXd& covariance_matrix) = 0;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) = 0;
+            Eigen::MatrixXd& covariance_matrix) = 0;
 
     virtual void transformToObservationSpace(const frapu::RobotStateSharedPtr& state,
             frapu::ObservationSharedPtr& res) const = 0;
@@ -171,8 +171,12 @@ public:
     virtual void addBox(std::string name, std::vector<double> dims);
 
     virtual void removeBox(std::string name);
+    
+    void setRandomEngine(std::default_random_engine &randomEngine);
 
 protected:
+    std::default_random_engine randomEngine_;
+    
     bool constraints_enforced_;
 
     std::string robot_file_;

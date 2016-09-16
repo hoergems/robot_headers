@@ -13,6 +13,8 @@ class AUV: public Robot
 {
 public:
     AUV(std::string robotFile, std::string configFile);
+    
+    virtual std::string getName() const override;
 
     void createRobotCollisionObjects(const frapu::RobotStateSharedPtr state,
                                      std::vector<frapu::CollisionObjectSharedPtr>& collision_objects) const override;    
@@ -62,12 +64,10 @@ public:
     void setGravityConstant(double gravity_constant) override;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) override;
+                                         Eigen::MatrixXd& covariance_matrix) override;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) override;
+            Eigen::MatrixXd& covariance_matrix) override;
 
     double calcLikelihood(const frapu::RobotStateSharedPtr& state, 
                           const frapu::ObservationSharedPtr& observation) const override;
