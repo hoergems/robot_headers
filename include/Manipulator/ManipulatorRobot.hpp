@@ -150,12 +150,10 @@ public:
             Eigen::MatrixXd& W) const override;
 
     virtual void makeProcessDistribution(Eigen::MatrixXd& mean,
-                                         Eigen::MatrixXd& covariance_matrix,
-                                         unsigned long seed) override;
+                                         Eigen::MatrixXd& covariance_matrix) override;
 
     virtual void makeObservationDistribution(Eigen::MatrixXd& mean,
-            Eigen::MatrixXd& covariance_matrix,
-            unsigned long seed) override;
+            Eigen::MatrixXd& covariance_matrix) override;
 
     bool propagate_first_order(std::vector<double>& current_state,
                                std::vector<double>& control_input,

@@ -55,7 +55,7 @@ namespace internal
 {
 template<typename Scalar>
 struct scalar_dist_op {
-    mutable std::default_random_engine rng;
+    static std::default_random_engine rng;
     //std::mt19937 rng;                        // The uniform pseudo-random algorithm
     mutable std::normal_distribution<Scalar> norm; // gaussian combinator
     mutable std::uniform_real_distribution<double> real_distr;
@@ -63,25 +63,18 @@ struct scalar_dist_op {
     EIGEN_EMPTY_STRUCT_CTOR(scalar_dist_op)
 
     template<typename Index>
-    inline const Scalar operator()(Index, Index = 0) const {
-        return norm(rng);
-    }
-    
-    inline void setRNG(std::default_random_engine &randomEngine) {
-        rng = randomEngine;
-    }
-
-    inline void seed(const uint64_t& s) {
-        rng.seed(s);
+    inline const Scalar operator()(Index, Index = 0) const {       
+	return norm(rng);        
     }
 
     inline double sampleUniform() {
-        return real_distr(rng);
+        double sample = real_distr(rng);
+        return sample;
     }
 };
 
-//template<typename Scalar>
-//std::mt19937 scalar_dist_op<Scalar>::rng;
+template<typename Scalar>
+std::default_random_engine scalar_dist_op<Scalar>::rng(frapu::globalSeed);
 
 /**template<typename Scalar>
 struct functor_traits<scalar_dist_op<Scalar> > {
@@ -100,10 +93,10 @@ template<typename Scalar>
 class Distribution
 {
 public:
-    Distibution(const std::default_random_engine &randomEngine) {
-        randN.setRNG(randomEngine);
+    Distribution() {
+	
     }
-    
+
     Matrix< Scalar, Dynamic, 1> _mean;
 
     Matrix<Scalar, Dynamic, Dynamic> _covar;
@@ -132,8 +125,8 @@ template<typename Scalar>
 class UniformDistribution: public Distribution<Scalar>
 {
 public:
-    UniformDistribution(const std::default_random_engine &randomEngine):
-        Distribution<Scalar>(randomEngine) {
+    UniformDistribution():
+        Distribution<Scalar>() {
 
     }
 };
@@ -142,8 +135,8 @@ template<typename Scalar>
 class WeightedDiscreteDistribution: public Distribution<Scalar>
 {
 public:
-    WeightedDiscreteDistribution(const std::default_random_engine &randomEngine):
-        Distribution<Scalar>(randomEngine),
+    WeightedDiscreteDistribution():
+        Distribution<Scalar>(),
         weightedElements_(),
         weights_(),
         hashValues_() {
@@ -152,32 +145,32 @@ public:
 
     void setElements(std::vector<std::pair<std::vector<Scalar>, double>>& elements) {
         double weight_sum = 0.0;
-	size_t dim = elements[0].first.size();
+        size_t dim = elements[0].first.size();
         weights_ = std::vector<Scalar>(elements.size());
-	hashValues_ = std::vector<size_t>(elements.size());
+        hashValues_ = std::vector<size_t>(elements.size());
         for (size_t i = 0; i < elements.size(); i++) {
             weight_sum += elements[i].second;
             weights_[i] = elements[i].second;
         }
 
         weightedElements_ = elements;
-	size_t hashValue;
+        size_t hashValue;
         for (size_t i = 0; i < elements.size(); i++) {
             weightedElements_[i].second /= weight_sum;
-	    
-	    hashValue = 0;
-	    for (auto &k: elements[i].first) {
-		frapu::hash_combine(hashValue, k);
-	    }
-	    
-	    hashValues_[i] = hashValue;
+
+            hashValue = 0;
+            for (auto & k : elements[i].first) {
+                frapu::hash_combine(hashValue, k);
+            }
+
+            hashValues_[i] = hashValue;
         }
     }
 
     Matrix < Scalar, Eigen::Dynamic, -1 > samples(int nn) override {
-	size_t numElements = weightedElements_.size();
-	assert(numElements > 0 && "WeightedDiscreteDistribution: No elements set!");
-	size_t dim = weightedElements_[0].first.size();
+        size_t numElements = weightedElements_.size();
+        assert(numElements > 0 && "WeightedDiscreteDistribution: No elements set!");
+        size_t dim = weightedElements_[0].first.size();
         Matrix < Scalar, Eigen::Dynamic, -1 > sampleMatrix(dim, nn);
         for (size_t i = 0; i < nn; i++) {
             double rand_num = this->randN.sampleUniform();
@@ -190,10 +183,10 @@ public:
 
                 rand_num -= weights_[j];
             }
-            
+
             for (size_t j = 0; j < dim; j++) {
-		sampleMatrix(j, i) = weightedElements_[index].first[j];
-	    }
+                sampleMatrix(j, i) = weightedElements_[index].first[j];
+            }
         }
 
         return sampleMatrix;
@@ -201,40 +194,32 @@ public:
 
     double calcPdf(std::vector<Scalar>& x, std::vector<Scalar>& mean) override {
         double value = x[0];
-	size_t hashValue = 0;
-	for (auto &k: x) {
-	    frapu::hash_combine(hashValue, k);
-	}
-	
-	size_t index = 0;
-	bool indexFound = false;
-	for (size_t i = 0; i < hashValues_.size(); i++) {
-	    if (hashValue == hashValues_[i]) {
-		index = i;
-		indexFound = true;
-                break;		
-	    }
-	}
-	if (indexFound) {
-	    return weightedElements_[index].second;
-	}
-	
-	return 0.0;
-	
-        /**for (auto & k : weightedElements_) {
-            if (k.first == value) {
-                return k.second;
-            }
+        size_t hashValue = 0;
+        for (auto & k : x) {
+            frapu::hash_combine(hashValue, k);
         }
 
-        return 0.0;*/
+        size_t index = 0;
+        bool indexFound = false;
+        for (size_t i = 0; i < hashValues_.size(); i++) {
+            if (hashValue == hashValues_[i]) {
+                index = i;
+                indexFound = true;
+                break;
+            }
+        }
+        if (indexFound) {
+            return weightedElements_[index].second;
+        }
+
+        return 0.0;
     }
 
 private:
     std::vector<std::pair<std::vector<Scalar>, double>> weightedElements_;
 
     std::vector<double> weights_;
-    
+
     std::vector<size_t> hashValues_;
 };
 
@@ -256,20 +241,30 @@ class EigenMultivariateNormal: public Distribution<Scalar>
     SelfAdjointEigenSolver<Matrix<Scalar, Dynamic, Dynamic> > _eigenSolver; // drawback: this creates a useless eigenSolver when using Cholesky decomposition, but it yields access to eigenvalues and vectors
 
 public:
-    EigenMultivariateNormal(const Matrix<Scalar, Dynamic, 1>& mean, const Matrix<Scalar, Dynamic, Dynamic>& covar,
-                            const std::default_random_engine &randomEngine,
+    EigenMultivariateNormal(const Matrix<Scalar, Dynamic, 1>& mean, const Matrix<Scalar, Dynamic, Dynamic>& covar,                            
                             const bool use_cholesky = false):
-        Distribution<Scalar>(randomEngine),
+        Distribution<Scalar>(),
         normal_dist_term1_(0.0),
-        _use_cholesky(use_cholesky) {        
+        _use_cholesky(use_cholesky) {
         this->setMean(mean);
         setCovar(covar);
         double det = covar.determinant();
         normal_dist_term1_ = 1.0 / std::sqrt(std::pow(2.0 * M_PI, covar.rows()) * det);
     }
 
-    double calcPdf(std::vector<Scalar>& x, std::vector<Scalar>& mean) override {
-        VectorXd mu(mean.size());
+    double calcPdf(std::vector<Scalar>& observation, std::vector<Scalar>& state) override {
+	VectorXd oV(observation.size());
+	VectorXd sV(state.size());
+	for (size_t i = 0; i < state.size(); i++) { 
+	    oV(i) = observation[i];
+	    sV(i) = state[i];
+	}
+	
+	VectorXd w = oV - sV;
+	double term2 = std::exp((-1.0 / 2.0) * (w).transpose() * this->_covar_inverse * w);
+        double pdf = normal_dist_term1_ * term2;
+	return pdf;
+        /**VectorXd mu(mean.size());
         VectorXd s(x.size());
         for (size_t i = 0; i < x.size(); i++) {
             mu(i) = mean[i];
@@ -278,7 +273,7 @@ public:
 
         double term2 = std::exp((-1.0 / 2.0) * (s - mu).transpose() * this->_covar_inverse * (s - mu));
         double pdf = normal_dist_term1_ * term2;
-        return pdf;
+        return pdf;*/
     }
 
     void setCovar(const Matrix<Scalar, Dynamic, Dynamic>& covar) override {
@@ -309,7 +304,7 @@ public:
 
     /// Draw nn samples from the gaussian and return them
     /// as columns in a Dynamic by nn matrix
-    Matrix < Scalar, Dynamic, -1 > samples(int nn) override{
+    Matrix < Scalar, Dynamic, -1 > samples(int nn) override {
         return (_transform * Matrix < Scalar, Dynamic, -1 >::NullaryExpr(this->_covar.rows(), nn, this->randN)).colwise() + this->_mean;
     }
 }; // end class EigenMultivariateNormal
