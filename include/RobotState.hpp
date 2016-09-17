@@ -17,8 +17,9 @@ public:
 
     virtual void print(std::ostream& os) const = 0;
     
-    virtual std::ostream& operator<< (std::ostream & out) const {
+    std::ostream& operator<< (std::ostream & out) {
         print(out);
+	return out;
     }
 
     virtual bool equals(frapu::RobotStateSharedPtr& otherState) const = 0;
