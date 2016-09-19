@@ -28,7 +28,7 @@ public:
     }
 
     virtual bool enforceLimits(frapu::RobotStateSharedPtr& state) const override {
-        std::vector<double> stateVec = static_cast<frapu::VectorState*>(state.get())->asVector();
+        std::vector<double> stateVec = static_cast<frapu::VectorState*>(state.get())->asVector();	
         bool enforced = false;
         for (size_t i = 0; i < stateVec.size(); i++) {
             if (stateVec[i] < lowerLimits_[i]) {

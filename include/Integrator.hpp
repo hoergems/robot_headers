@@ -1,6 +1,7 @@
 #ifndef __INTEGRATOR_HPP__
 #define __INTEGRATOR_HPP__
 #include <vector>
+#include <frapu_core/core.hpp>
 
 namespace frapu
 {

@@ -14,7 +14,7 @@ public:
     }
 
     bool enforceLimits(frapu::RobotStateSharedPtr& state) const override {
-        std::vector<double> stateVec = static_cast<frapu::VectorState*>(state.get())->asVector();
+        std::vector<double> stateVec = static_cast<frapu::VectorState*>(state.get())->asVector();	
         bool return_val = true;
         for (size_t i = 0; i < stateVec.size() / 2; i++) {
             if (stateVec[i] < lowerLimits_[i]) {
@@ -27,7 +27,7 @@ public:
                 return_val = false;
             }
 
-            if (stateVec[i + stateVec.size() / 2] < lowerLimits_[i + stateVec.size() / 2]) {
+            if (stateVec[i + stateVec.size() / 2] < lowerLimits_[i + stateVec.size() / 2]) {		
                 stateVec[i + stateVec.size() / 2] = lowerLimits_[i + stateVec.size() / 2];
                 return_val = false;
             }
@@ -37,7 +37,8 @@ public:
                 return_val = false;
             }
         }
-
+        
+        state = std::make_shared<frapu::VectorState>(stateVec);
         return return_val;
     }
 
