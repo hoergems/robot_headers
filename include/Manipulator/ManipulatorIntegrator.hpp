@@ -15,6 +15,7 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <rbdl_interface/rbdl_interface.hpp>
 #include <robot_headers/Integrator.hpp>
+#include <functional>
 
 namespace pl = std::placeholders;
 using namespace Eigen;
@@ -42,6 +43,13 @@ public:
                           double& f_roll,
                           double& f_pitch,
                           double& f_yaw);
+
+    void setStateSpaceDimension(size_t& stateSpaceDimension);
+
+    void setControlSpaceDimension(size_t& controlSpaceDimension);
+
+    void forwardDynamics(double* vals, Eigen::VectorXd& res);
+
 
     /**
      * Set the joint acceleration limit
@@ -87,6 +95,12 @@ public:
                             const std::string& observationType,
                             std::vector<MatrixXd>& matrices) const;
 
+    void getProcessMatrices2(const std::vector<double>& x,
+                            std::vector<double>& rho,
+                            double t_e,
+                            const std::string& observationType,
+                            std::vector<MatrixXd>& matrices) const;
+
     void getLinearObservationDynamics(const std::vector<double>& state,
                                       const std::string& observationType,
                                       Eigen::MatrixXd& H,
@@ -114,13 +128,10 @@ public:
     std::shared_ptr<frapu::RBDLInterface> getRBDLInterface();
 
 private:
-MatrixXd getW0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getH0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getM0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getV0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getB0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getA0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
-MatrixXd getF0(const state_type &x, const state_type &rho, const state_type &zeta) const; 
+    MatrixXd getW0(const state_type& x, const state_type& rho, const state_type& zeta) const;
+    MatrixXd getH0(const state_type& x, const state_type& rho, const state_type& zeta) const;
+    MatrixXd getM0(const state_type& x, const state_type& rho, const state_type& zeta) const;
+    MatrixXd getF0(const state_type& x, const state_type& rho, const state_type& zeta) const;
 
 
     // A fuction type of he form MatrixXd function(const state_type&) const
@@ -129,7 +140,7 @@ MatrixXd getF0(const state_type &x, const state_type &rho, const state_type &zet
     // A member function pointer for the above declared member function type
     typedef ABFuncType Integrate::* AB_funct;
 
-    MatrixXd power_series_(MatrixXd& m, double t, int depth) const;
+    MatrixXd power_series_(const MatrixXd& m, double t, int depth) const;
 
     void calc_inverse_inertia_matrix(MatrixXd& M) const;
 
@@ -155,6 +166,14 @@ MatrixXd getF0(const state_type &x, const state_type &rho, const state_type &zet
     mutable double f_roll_;
     mutable double f_pitch_;
     mutable double f_yaw_;
+    
+    std::shared_ptr<Eigen::MatrixXd> A_;
+    std::shared_ptr<Eigen::MatrixXd> B_;
+    std::shared_ptr<Eigen::MatrixXd> V_;
+    
+    std::function<void (double*)> AFunct_;
+    std::function<void (double*)> BFunct_;
+    std::function<void (double*)> VFunct_;
 
     /**
      * The joint acceleration limit
@@ -199,6 +218,10 @@ MatrixXd getF0(const state_type &x, const state_type &rho, const state_type &zet
     mutable VectorXd vel_;
 
     std::shared_ptr<frapu::RBDLInterface> rbdl_interface_;
+
+    size_t stateSpaceDimension_;
+
+    size_t controlSpaceDimension_;
 
 };
 

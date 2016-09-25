@@ -2,6 +2,7 @@
 #define __INTEGRATOR_HPP__
 #include <vector>
 #include <frapu_core/core.hpp>
+#include "Partial.hpp"
 
 namespace frapu
 {
